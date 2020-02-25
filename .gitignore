@@ -19,3 +19,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# sonar ignore
+sonar-project.properties
+.sonar

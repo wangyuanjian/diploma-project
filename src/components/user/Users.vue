@@ -16,6 +16,10 @@
         <el-col :span="4">
           <el-button type="primary" @click="addDialogVisible = true">Add User</el-button>
         </el-col>
+
+        <el-col :span="4" :offset="5">
+          <el-button type="success" @click="exportUserExcel">Export Excel</el-button>
+        </el-col>
       </el-row>
       <!-- user tables -->
        <el-table
@@ -442,6 +446,26 @@ export default {
     },
     pwdDialogClose () {
       this.$refs.pwdFormRef.resetFields()
+    },
+    async exportUserExcel () {
+      const result = await this.$http.get('/exportUserExcel', {
+        responseType: 'blob'
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to export email')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      const blob = new Blob([result.data], {
+        type: 'application/vnd.ms-excel'
+      })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'users-information.xls'
+      a.click()
+      window.URL.revokeObjectURL(url)
     }
   }
 }
