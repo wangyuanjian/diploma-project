@@ -14,11 +14,10 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addDialogVisible = true">Add User</el-button>
+          <el-button type="primary" @click="showAddDialog" plain icon="el-icon-circle-plus-outline">Add User</el-button>
         </el-col>
-
-        <el-col :span="4" :offset="5">
-          <el-button type="success" @click="exportUserExcel">Export Excel</el-button>
+        <el-col :span="4" :offset="7">
+          <el-button type="success" @click="exportUserExcel" plain icon="el-icon-download">Export Excel</el-button>
         </el-col>
       </el-row>
       <!-- user tables -->
@@ -62,16 +61,20 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="create time" width="200px"></el-table-column>
-        <el-table-column label="operation" width="200">
+        <el-table-column label="operation" width="250">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="edit info" placement="top">
-              <el-button type="primary" size="small" @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+              <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="update password" placement="top">
-              <el-button type="success" size="small" @click="showPwdDialog(scope.row)" icon="el-icon-setting"></el-button>
+              <el-button type="success" size="small" plain @click="showPwdDialog(scope.row)" icon="el-icon-setting"></el-button>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="assign role" placement="top">
+              <el-button type="warning" size="small" plain @click="showRoleDialog(scope.row)"
+              icon="el-icon-edit-outline"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="delete user" placement="top">
-              <el-button type="danger" size="small" @click="deleteUser(scope.row)"
+              <el-button type="danger" size="small" plain @click="deleteUser(scope.row)"
               :disabled="scope.row.enabled !== 1" icon="el-icon-delete"></el-button>
             </el-tooltip>
           </template>
@@ -114,6 +117,17 @@
         </el-form-item>
         <el-form-item label="age" prop="age">
           <el-input v-model="addForm.age" type="number" min="1" max="100"></el-input>
+        </el-form-item>
+        <el-form-item label="Select Role" >
+          <el-select v-model="addForm.roleId" size="medium"
+            :multiple="false" placeholder="select Role">
+            <el-option
+              v-for="item in roleList"
+              :key="item.roleId"
+              :label="item.roleName"
+              :value="item.roleId">
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
 
@@ -176,6 +190,32 @@
       </span>
     </el-dialog>
 
+    <!-- assign user's role-->
+    <el-dialog
+      title="Assign Role"
+      :visible.sync="assignDialogVisible"
+      width="30%">
+      <el-form label-width="100px" size="medium">
+        <el-form-item label="Username">
+          <el-input v-model="assigForm.username" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="Select Role" >
+          <el-select v-model="assigForm.assignedRoleId" size="medium"
+            :multiple="false" placeholder="select Role">
+            <el-option
+              v-for="item in roleList"
+              :key="item.roleId"
+              :label="item.roleName"
+              :value="item.roleId">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="assignDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="assignRole">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -217,7 +257,8 @@ export default {
         age: '',
         password: '',
         confirmPassword: '',
-        email: ''
+        email: '',
+        roleId: 0
       },
       addFormRules: {
         username: [
@@ -275,6 +316,14 @@ export default {
           { required: true, message: 'invalid password', trigger: 'blur' },
           { validator: checkNewPassword2, trigger: 'blur' }
         ]
+      },
+      assignDialogVisible: false,
+      roleList: [],
+      assigForm: {
+        userId: '',
+        username: '',
+        roleName: '',
+        assignedRoleId: 0
       }
     }
   },
@@ -294,7 +343,7 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      console.log(result)
+      // console.log(result)
       this.userList = result.data.result.list
       this.total = result.data.result.total
     },
@@ -337,17 +386,25 @@ export default {
     addDialogClose () {
       this.$refs.addFormRef.resetFields()
     },
+    showAddDialog () {
+      this.addDialogVisible = true
+      this.getRoleList()
+    },
     addUser () {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) {
           return this.$message.error('invalid user info')
+        }
+        const role = {
+          roleId: this.addForm.roleId
         }
         const result = await this.$http.post('/insertUser', {
           username: this.addForm.username,
           password: this.addForm.password,
           nickname: this.addForm.nickname,
           age: this.addForm.age,
-          email: this.addForm.email
+          email: this.addForm.email,
+          role: role
         })
         if (result.status !== 200) {
           return this.$message.error('failed to add user ' + this.addForm.username)
@@ -466,6 +523,45 @@ export default {
       a.download = 'users-information.xls'
       a.click()
       window.URL.revokeObjectURL(url)
+    },
+    showRoleDialog (userData) {
+      // console.log(userData)
+      this.assigForm.userId = userData.userId
+      this.assigForm.username = userData.username
+      this.assigForm.assignedRoleId = 0
+      if (userData.role && userData.role.roleId) {
+        this.assigForm.assignedRoleId = userData.role.roleId
+      }
+      this.assignDialogVisible = true
+      this.getRoleList()
+    },
+    async getRoleList () {
+      const result = await this.$http.get('/getRoleList')
+      if (result.status !== 200) {
+        return this.$message.error('failed to load role info')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.roleList = result.data.result
+    },
+    async assignRole () {
+      var role = {
+        roleId: this.assigForm.assignedRoleId
+      }
+      const result = await this.$http.post('/updateRoleForUser', {
+        userId: this.assigForm.userId,
+        role: role
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to update role for user')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.assignDialogVisible = false
+      this.$message.success('update role for user successfully')
+      this.getUserList()
     }
   }
 }
@@ -488,5 +584,11 @@ export default {
 }
 /deep/ .el-form-item__content {
   font-size: 15px;
+}
+/deep/ .el-breadcrumb__item {
+  font-size: 17px;
+}
+.el-select {
+  width: 100%;
 }
 </style>
