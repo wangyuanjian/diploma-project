@@ -64,7 +64,7 @@
       width="30%" @close="editDialogClose">
 
       <el-form :model="editForm" :rules="editFormRules"
-      ref="editFormRef" label-width="15x0px" size="medium">
+      ref="editFormRef" label-width="150px" size="medium">
         <el-form-item label="authorityId">
           <el-input v-model="editForm.authorityId" disabled></el-input>
         </el-form-item>
