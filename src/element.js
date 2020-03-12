@@ -3,11 +3,18 @@ import {
   Button, Form, FormItem, Input, Message, Container, Header, Aside, Main,
   Menu, Submenu, MenuItemGroup, MenuItem, Breadcrumb, BreadcrumbItem, Card,
   Row, Col, Table, TableColumn, Switch, Tooltip, Pagination, MessageBox, Dialog,
-  Tag, Option, Select, Tree, Cascader
+  Tag, Option, Select, Tree, Cascader, Alert, Tabs, TabPane, Step, Steps,
+  Upload
 } from 'element-ui'
 
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
+Vue.use(Upload)
+Vue.use(Step)
+Vue.use(Steps)
+Vue.use(TabPane)
+Vue.use(Tabs)
+Vue.use(Alert)
 Vue.use(Cascader)
 Vue.use(Tree)
 Vue.use(Select)
