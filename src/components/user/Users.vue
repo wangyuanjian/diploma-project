@@ -509,7 +509,7 @@ export default {
         responseType: 'blob'
       })
       if (result.status !== 200) {
-        return this.$message.error('failed to export email')
+        return this.$message.error('failed to export user excel')
       }
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
@@ -575,6 +575,7 @@ export default {
   width: 90px;
   color: #99a9bf;
   font-size: 15px;
+  font-weight: bold;
 }
 .demo-table-expand .el-form-item {
   margin-right: 0;
