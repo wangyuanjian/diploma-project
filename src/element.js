@@ -4,11 +4,13 @@ import {
   Menu, Submenu, MenuItemGroup, MenuItem, Breadcrumb, BreadcrumbItem, Card,
   Row, Col, Table, TableColumn, Switch, Tooltip, Pagination, MessageBox, Dialog,
   Tag, Option, Select, Tree, Cascader, Alert, Tabs, TabPane, Step, Steps,
-  Upload
+  Upload, DatePicker, Popover
 } from 'element-ui'
 
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
+Vue.use(Popover)
+Vue.use(DatePicker)
 Vue.use(Upload)
 Vue.use(Step)
 Vue.use(Steps)

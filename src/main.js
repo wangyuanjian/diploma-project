@@ -35,6 +35,14 @@ Vue.prototype.$http = axios
 Vue.component('tree-table', TreeTable)
 Vue.config.productionTip = false
 Vue.use(VueQuillEditor)
+// 定义过滤器
+Vue.filter('sub-goods-name', function (value, size) {
+  if (value.length >= size) {
+    return value.substr(0, size) + '...'
+  } else {
+    return value
+  }
+})
 
 new Vue({
   router,

@@ -9,6 +9,7 @@ import Authorities from '../components/authority/Authorities.vue'
 import Categories from '../components/finance/Categories.vue'
 import Goods from '../components/finance/Goods.vue'
 import AddGoods from '../components/finance/AddGoods.vue'
+import Order from '../components/finance/Order.vue'
 
 Vue.use(VueRouter)
 
@@ -26,6 +27,7 @@ const routes = [
       { path: '/authorities', component: Authorities },
       { path: '/categories', component: Categories },
       { path: '/goods', component: Goods },
+      { path: '/orders', component: Order },
       { path: '/goods/add', component: AddGoods }
     ]
   }

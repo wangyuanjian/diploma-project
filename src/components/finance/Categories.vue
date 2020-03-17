@@ -150,7 +150,7 @@ export default {
         return this.$message.error(result.data.errorMessage)
       }
       this.categoryList = result.data.result
-      console.log(this.categoryList)
+      // console.log(this.categoryList)
     },
     // 在打开该添加dialog时将分类列表数据重新赋值
     showAddDialog () {
