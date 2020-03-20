@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "core-js": "^3.6.4",
+    "echarts": "^4.1.0",
     "element-ui": "^2.5.1",
     "vue": "^2.6.11",
     "vue-quill-editor": "^3.0.6",

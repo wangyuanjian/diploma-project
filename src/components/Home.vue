@@ -105,6 +105,7 @@ export default {
   .el-menu{
     border-right: none;
   }
+  width: 230px !important;
 }
 .el-main{
   background-color: #f9f7f7;

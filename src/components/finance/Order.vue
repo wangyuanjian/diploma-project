@@ -7,16 +7,20 @@
     </el-breadcrumb>
     <el-card>
       <div class="header-box">
-        <el-input placeholder="Input name for query" v-model="queryInfo.info" clearable style="width: 20%"></el-input>
-        <el-date-picker v-model="dateRange" type="daterange" range-separator="to"
-        start-placeholder="Start Date" end-placeholder="End Date"
-        format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd"
-        @change="datePickerChanged" style="margin-left: 15px;">
-        </el-date-picker>
-        <el-button type="primary" @click="searchOrders" plain
-        icon="el-icon-search" style="margin-left: 15px;">search</el-button>
-        <el-button type="success" @click="showAddDialog" plain
+        <div class="inline-div">
+          <el-input placeholder="Input name for query" v-model="queryInfo.info" clearable style="width: 20%"></el-input>
+          <el-date-picker v-model="dateRange" type="daterange" range-separator="to"
+          start-placeholder="Start Date" end-placeholder="End Date"
+          format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd"
+          @change="datePickerChanged" style="margin-left: 15px;">
+          </el-date-picker>
+          <el-button type="primary" @click="searchOrders" plain
+          icon="el-icon-search" style="margin-left: 15px;">search</el-button>
+        </div>
+        <div class="inline-div">
+          <el-button type="success" @click="showAddDialog" plain
         icon="el-icon-circle-plus-outline" class="add-btn">Add New Order</el-button>
+        </div>
       </div>
       <div class="order-box">
         <div class="order-item" v-for="item in orderList" :key="item.orderId">
@@ -550,9 +554,12 @@ export default {
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
 }
-.add-btn {
-  position: absolute;
-  right: 45px;
+.inlint-div {
+  display: inline-block;
+}
+.header-box {
+  display: flex;
+  justify-content: space-between;
 }
 .order-box {
   margin-top: 30px;
