@@ -49,10 +49,10 @@
               <el-form-item label="Remark">
                 <span>{{ scope.row.remark }}</span>
               </el-form-item>
-              <el-form-item label="create-time">
+              <el-form-item label="Create time">
                 <span>{{ scope.row.createTime }}</span>
               </el-form-item>
-              <el-form-item label="update-time">
+              <el-form-item label="Update time">
                 <span>{{ scope.row.updateTime }}</span>
               </el-form-item>
             </el-form>
@@ -72,7 +72,7 @@
         <el-table-column label="Balance($)" prop="balance" width="100px" align="center"></el-table-column>
         <el-table-column label="Operation" align="center" width="150">
           <template slot-scope="scope">
-            <el-tooltip effect="dark" content="edit Income/Expense" placement="top">
+            <el-tooltip effect="dark" content="edit Income/Expense; If you want to modify money, delete this record and add a new one" placement="top">
               <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="delete Income/Expense" placement="top">
@@ -97,9 +97,48 @@
         <el-tab-pane label="Last Week" name="first">Last Week</el-tab-pane>
         <el-tab-pane label="Last Month" name="second">Last Month</el-tab-pane>
         <el-tab-pane label="Customed Time Span" name="third">Customed Time Span</el-tab-pane>
+        <el-tab-pane label="All Time" name="fourth">All Time</el-tab-pane>
       </el-tabs>
+      <!-- edit income/expense -->
+      <el-dialog
+      title="Edit User"
+      :visible.sync="editDialogVisible"
+      width="40%" @close="editDialogClose">
+
+        <el-form :model="editForm" :rules="editFormRules"
+        ref="editFormRef" label-width="100px" size="medium">
+          <el-form-item label="About" prop="name">
+            <el-input v-model="editForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="Remark">
+            <el-input v-model="editForm.remark"></el-input>
+          </el-form-item>
+          <el-form-item label="Date" prop="date">
+            <el-date-picker v-model="editForm.date" type="date" placeholder="select date"
+            class="add-date-picker" value-format="yyyy-MM-dd">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="Direction">
+            <el-input v-model="editForm.direction" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="Money($)">
+            <el-input v-model="editForm.money" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="Balance($)">
+            <el-input v-model="editForm.balance" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="Username">
+            <el-input v-model="editForm.username" disabled></el-input>
+          </el-form-item>
+        </el-form>
+
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="editDialogVisible = false" size="medium">Cancel</el-button>
+          <el-button type="primary" @click="editIncomeExpense" size="medium">Edit</el-button>
+        </span>
+      </el-dialog>
     </el-card>
-    <!-- Add User -->
+    <!-- Add Income/Expense -->
     <el-dialog
       title="Add Income/Expense"
       :visible.sync="addDialogVisible"
@@ -202,6 +241,25 @@ export default {
         date: [
           { required: true, message: 'date is necessary', trigger: 'blur' }
         ]
+      },
+      editDialogVisible: false,
+      editForm: {
+        id: 0,
+        name: '',
+        remark: '',
+        money: 0,
+        balance: 0,
+        date: '',
+        username: '',
+        direction: ''
+      },
+      editFormRules: {
+        name: [
+          { required: true, message: 'description is necessary', trigger: 'blur' }
+        ],
+        date: [
+          { required: true, message: 'date is necessary', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -272,13 +330,73 @@ export default {
       this.addForm.userId = ''
       this.addForm.remark = ''
     },
-    showEditDialog (inOutData) {},
-    showDeleteDialog (inOutData) {},
+    showDeleteDialog (inOutData) {
+      const deleteMsg = '[ ' + inOutData.name + ' ] with value($) [ ' + inOutData.money + ' ] will be deleted, Continue?'
+      this.$confirm(deleteMsg, 'Delete Param', {
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async what => {
+        const result = await this.$http.post('/deleteIncomeExpense', {
+          id: inOutData.id,
+          createTime: inOutData.createTime
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to delete Income/Expense')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.$message.success('delete param Income/Expense')
+        this.selectedIds = []
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'delete Income/Expense cancelled'
+        })
+      })
+    },
     handleSizeChange (newSize) {
       this.queryInfo.pageSize = newSize
     },
     handleCurrentChange (newNum) {
       this.queryInfo.newNum = newNum
+    },
+    showEditDialog (inOutData) {
+      this.editDialogVisible = true
+      this.editForm.id = inOutData.id
+      this.editForm.name = inOutData.name
+      this.editForm.remark = inOutData.remark
+      this.editForm.money = inOutData.money
+      this.editForm.balance = inOutData.balance
+      this.editForm.date = inOutData.date
+      this.editForm.username = inOutData.username
+      this.editForm.direction = inOutData.direction === 1 ? 'expense' : 'income'
+    },
+    editDialogClose () {
+      this.$refs.editFormRef.resetFields()
+    },
+    editIncomeExpense () {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error('invalid Income/Expense info')
+        }
+        const result = await this.$http.post('/updateIncomeExpense', {
+          id: this.editForm.id,
+          name: this.editForm.name,
+          remark: this.editForm.remark,
+          date: this.editForm.date
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to update Income/Expense ')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.editDialogVisible = false
+        this.$message.success('edit Income/Expense successfully')
+        this.getIncomeExpenseList()
+      })
     }
   }
 }
