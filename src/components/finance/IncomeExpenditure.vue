@@ -14,7 +14,7 @@
           format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd"
           style="margin-left: 15px;">
           </el-date-picker>
-          <el-button type="primary" @click="searchInouts" plain
+          <el-button type="primary" @click="getIncomeExpenseList" plain
           icon="el-icon-search" style="margin-left: 15px;">search</el-button>
         </div>
         <div class="inlint-div">
@@ -93,51 +93,65 @@
       <p>
         <span class="display-title">Data Statistics</span>
       </p>
-      <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="Last Week" name="first">Last Week</el-tab-pane>
-        <el-tab-pane label="Last Month" name="second">Last Month</el-tab-pane>
+      <el-tabs @tab-click="handleClick">
+        <el-tab-pane label="Last Week" name="first">
+          <div>
+            <div id="left-7days" class="left-data"></div>
+            <div id="right-7days" class="right-data">
+              right side
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="Last Month" name="second">
+          <div>
+            <div id="left-1month" class="left-data"></div>
+            <div id="right-1month" class="right-data">
+              right
+            </div>
+          </div>
+        </el-tab-pane>
         <el-tab-pane label="Customed Time Span" name="third">Customed Time Span</el-tab-pane>
         <el-tab-pane label="All Time" name="fourth">All Time</el-tab-pane>
       </el-tabs>
-      <!-- edit income/expense -->
-      <el-dialog
-      title="Edit User"
-      :visible.sync="editDialogVisible"
-      width="40%" @close="editDialogClose">
-
-        <el-form :model="editForm" :rules="editFormRules"
-        ref="editFormRef" label-width="100px" size="medium">
-          <el-form-item label="About" prop="name">
-            <el-input v-model="editForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="Remark">
-            <el-input v-model="editForm.remark"></el-input>
-          </el-form-item>
-          <el-form-item label="Date" prop="date">
-            <el-date-picker v-model="editForm.date" type="date" placeholder="select date"
-            class="add-date-picker" value-format="yyyy-MM-dd">
-            </el-date-picker>
-          </el-form-item>
-          <el-form-item label="Direction">
-            <el-input v-model="editForm.direction" disabled></el-input>
-          </el-form-item>
-          <el-form-item label="Money($)">
-            <el-input v-model="editForm.money" disabled></el-input>
-          </el-form-item>
-          <el-form-item label="Balance($)">
-            <el-input v-model="editForm.balance" disabled></el-input>
-          </el-form-item>
-          <el-form-item label="Username">
-            <el-input v-model="editForm.username" disabled></el-input>
-          </el-form-item>
-        </el-form>
-
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="editDialogVisible = false" size="medium">Cancel</el-button>
-          <el-button type="primary" @click="editIncomeExpense" size="medium">Edit</el-button>
-        </span>
-      </el-dialog>
     </el-card>
+    <!-- edit income/expense -->
+    <el-dialog
+    title="Edit User"
+    :visible.sync="editDialogVisible"
+    width="40%" @close="editDialogClose">
+
+      <el-form :model="editForm" :rules="editFormRules"
+      ref="editFormRef" label-width="100px" size="medium">
+        <el-form-item label="About" prop="name">
+          <el-input v-model="editForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="Remark">
+          <el-input v-model="editForm.remark"></el-input>
+        </el-form-item>
+        <el-form-item label="Date" prop="date">
+          <el-date-picker v-model="editForm.date" type="date" placeholder="select date"
+          class="add-date-picker" value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="Direction">
+          <el-input v-model="editForm.direction" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Money($)">
+          <el-input v-model="editForm.money" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Balance($)">
+          <el-input v-model="editForm.balance" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Username">
+          <el-input v-model="editForm.username" disabled></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false" size="medium">Cancel</el-button>
+        <el-button type="primary" @click="editIncomeExpense" size="medium">Edit</el-button>
+      </span>
+    </el-dialog>
     <!-- Add Income/Expense -->
     <el-dialog
       title="Add Income/Expense"
@@ -195,10 +209,13 @@
 </template>
 
 <script>
+import echarts from 'echarts'
 export default {
   data () {
     return {
       inOutList: [],
+      inOutList7Days: [],
+      inOutList1Month: [],
       userList: [],
       queryInfo: {
         info: '',
@@ -397,7 +414,159 @@ export default {
         this.$message.success('edit Income/Expense successfully')
         this.getIncomeExpenseList()
       })
-    }
+    },
+    // tabComponent 是VueComponent实例，可通过index或者name
+    // 判断具体点击的Tab
+    handleClick (tabComponent) {
+      if (tabComponent.name === 'first') {
+        this.queryInOutListBefore(7)
+      } else if (tabComponent.name === 'second') {
+        this.queryInOutListBefore(30)
+      } else if (tabComponent.name === 'third') {
+        console.log()
+      } else if (tabComponent.name === 'fourth') {
+        console.log()
+      }
+    },
+    async queryInOutListBefore (nDays) {
+      if (((!this.inOutList7Days || this.inOutList7Days.length === 0) && nDays === 7) ||
+      (((!this.inOutList1Month || this.inOutList1Month.length === 0) && nDays === 30))) {
+        const result = await this.$http.get('/getIncomeExpenseDateBefore?nDays=' + nDays)
+        if (result.status !== 200) {
+          return this.$message.error('failed to load recent Days')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        if (nDays === 7) {
+          this.inOutList7Days = result.data.result
+        } else if (nDays === 30) {
+          this.inOutList1Month = result.data.result
+        }
+        this.$message.success('query Income/Expense list successfully')
+      }
+      if (nDays === 7) {
+        this.processDataAnalysisLeft(this.inOutList7Days, 'left-7days')
+        this.processDataAnalysisRight(this.inOutList7Days, 'right-7days')
+      } else if (nDays === 30) {
+        this.processDataAnalysisLeft(this.inOutList1Month, 'left-1month')
+        this.processDataAnalysisRight(this.inOutList1Month, 'right-1month')
+      }
+    },
+    processDataAnalysisLeft (inOutList, divName) {
+      var incomeTotal = 0
+      var expenseTotal = 0
+      for (var i = 0; i < inOutList.length; i++) {
+        incomeTotal = incomeTotal + inOutList[i].income
+        expenseTotal = expenseTotal + inOutList[i].expense
+      }
+      var myPieChart = echarts.init(document.getElementById(divName))
+      var option = {
+        title: {
+          text: 'Statistic of Income and Expense in Last Week'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        toolbox: {
+          y: 'bottom',
+          feature: {
+            saveAsImage: {
+              pixelRatio: 2
+            }
+          }
+        },
+        legend: {
+          orient: 'vertical',
+          right: 10,
+          top: 10,
+          data: ['Income', 'Expense']
+        },
+        series: [{
+          name: '访问来源',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '30',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: [
+            { value: 35, name: 'Income' },
+            { value: 73, name: 'Expense' }
+          ]
+        }]
+      }
+      myPieChart.setOption(option)
+    },
+    processDataAnalysisRight (inOutList, divName) {
+      var dateList = []
+      var incomeList = []
+      var expenseList = []
+      var diffList = []
+      for (var i = 0; i < inOutList.length; i++) {
+        dateList.push(inOutList[i].date.substr(0, 10))
+        incomeList.push(inOutList[i].income)
+        expenseList.push(inOutList[i].expense * -1)
+        diffList.push(inOutList[i].income - inOutList[i].expense)
+      }
+      var myPieChart = echarts.init(document.getElementById(divName))
+      var option = {
+        title: {
+          text: 'Bar of Income and Expense in Last Week'
+        },
+        legend: {
+          data: ['Income', 'Expense', 'Diff'],
+          right: 10,
+          top: 10,
+          orient: 'vertical'
+        },
+        toolbox: {
+          y: 'bottom',
+          feature: {
+            saveAsImage: {
+              pixelRatio: 2
+            }
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: dateList
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          name: 'Income',
+          data: incomeList,
+          type: 'bar',
+          animationDelay: function (idx) {
+            return idx * 10
+          }
+        }, {
+          name: 'Expense',
+          data: expenseList,
+          type: 'bar'
+        }, {
+          name: 'Diff',
+          data: diffList,
+          type: 'line'
+        }]
+      }
+      myPieChart.setOption(option)
+    },
+    exportUserExcel () {}
   }
 }
 </script>
@@ -447,5 +616,19 @@ export default {
   margin-bottom: 0;
   width: 50%;
   font-size: 20px !important;
+}
+.left-data {
+  width: 600px;
+  height: 400px;
+  // display: inline-block;
+  // border: 2px solid orangered;
+  margin: 0 auto;
+}
+.right-data {
+  width: 800px;
+  height: 600px;
+  // display: inline-block;
+  // border: 2px solid palevioletred;
+  margin: 0 auto;
 }
 </style>
