@@ -11,7 +11,7 @@
           <el-input placeholder="Input key words" v-model="queryInfo.info" clearable style="width: 30%"></el-input>
           <el-date-picker v-model="dateRange" type="daterange" range-separator="to"
           start-placeholder="Start Date" end-placeholder="End Date"
-          format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd"
+          format="yyyy - MM - dd" value-format="yyyy-MM-dd"
           style="margin-left: 15px;">
           </el-date-picker>
           <el-button type="primary" @click="getIncomeExpenseList" plain
@@ -97,21 +97,37 @@
         <el-tab-pane label="Last Week" name="first">
           <div>
             <div id="left-7days" class="left-data"></div>
-            <div id="right-7days" class="right-data">
-              right side
-            </div>
+            <div id="right-7days" class="right-data"></div>
           </div>
         </el-tab-pane>
         <el-tab-pane label="Last Month" name="second">
           <div>
             <div id="left-1month" class="left-data"></div>
-            <div id="right-1month" class="right-data">
-              right
+            <div id="right-1month" class="right-data"></div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="Customed Time Span" name="third">
+          <div>
+             <div class="search-for-analysis-bar">
+              <el-date-picker v-model="dateRangeForAnalysis" type="daterange" range-separator="to"
+              start-placeholder="Start Date" end-placeholder="End Date"
+              format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+              style="margin-left: 15px;"></el-date-picker>
+              <el-button type="primary" @click="getInOutListForAnalysis" plain
+              icon="el-icon-search" style="margin-left: 15px;">search</el-button>
+            </div>
+            <div>
+              <div id="left-custom" class="left-data"></div>
+              <div id="right-custom" class="right-data"></div>
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="Customed Time Span" name="third">Customed Time Span</el-tab-pane>
-        <el-tab-pane label="All Time" name="fourth">All Time</el-tab-pane>
+        <el-tab-pane label="All Time" name="fourth">
+          <div>
+            <div id="left-all" class="left-data"></div>
+            <div id="right-all" class="right-data"></div>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </el-card>
     <!-- edit income/expense -->
@@ -277,7 +293,9 @@ export default {
         date: [
           { required: true, message: 'date is necessary', trigger: 'blur' }
         ]
-      }
+      },
+      dateRangeForAnalysis: [],
+      inOutListForAnalysis: []
     }
   },
   created () {
@@ -463,7 +481,12 @@ export default {
       var myPieChart = echarts.init(document.getElementById(divName))
       var option = {
         title: {
-          text: 'Statistic of Income and Expense in Last Week'
+          text: 'Statistic of Income and Expense in Last Week',
+          subText: 'updated every 0 o\'clock in the midnght',
+          left: 'center',
+          textStyle: {
+            fontSize: 20
+          }
         },
         tooltip: {
           trigger: 'item',
@@ -480,7 +503,7 @@ export default {
         legend: {
           orient: 'vertical',
           right: 10,
-          top: 10,
+          top: 20,
           data: ['Income', 'Expense']
         },
         series: [{
@@ -503,8 +526,8 @@ export default {
             show: false
           },
           data: [
-            { value: 35, name: 'Income' },
-            { value: 73, name: 'Expense' }
+            { value: incomeTotal, name: 'Income' },
+            { value: expenseTotal, name: 'Expense' }
           ]
         }]
       }
@@ -521,10 +544,15 @@ export default {
         expenseList.push(inOutList[i].expense * -1)
         diffList.push(inOutList[i].income - inOutList[i].expense)
       }
-      var myPieChart = echarts.init(document.getElementById(divName))
+      var myBarChart = echarts.init(document.getElementById(divName))
       var option = {
         title: {
-          text: 'Bar of Income and Expense in Last Week'
+          text: 'Bar of Income and Expense in Last Week',
+          subText: 'updated every 0 o\'clock in the midnght',
+          left: 'center',
+          textStyle: {
+            fontSize: 20
+          }
         },
         legend: {
           data: ['Income', 'Expense', 'Diff'],
@@ -564,9 +592,24 @@ export default {
           type: 'line'
         }]
       }
-      myPieChart.setOption(option)
+      myBarChart.setOption(option)
     },
-    exportUserExcel () {}
+    exportUserExcel () {},
+    async getInOutListForAnalysis () {
+      const result = await this.$http.post('/getIncomeExpenseListInDateSpan', {
+        startTime: this.dateRangeForAnalysis[0],
+        endTime: this.dateRangeForAnalysis[1]
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load order')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.inOutListForAnalysis = result.data.result
+      this.processDataAnalysisLeft(this.inOutListForAnalysis, 'left-custom')
+      this.processDataAnalysisRight(this.inOutListForAnalysis, 'right-custom')
+    }
   }
 }
 </script>
@@ -630,5 +673,9 @@ export default {
   // display: inline-block;
   // border: 2px solid palevioletred;
   margin: 0 auto;
+}
+.search-for-analysis-bar {
+  margin-top: 10px;
+  margin-bottom: 25px;
 }
 </style>
