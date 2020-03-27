@@ -230,6 +230,7 @@ export default {
   data () {
     return {
       inOutList: [],
+      inOutListAllDays: [],
       inOutList7Days: [],
       inOutList1Month: [],
       userList: [],
@@ -443,12 +444,13 @@ export default {
       } else if (tabComponent.name === 'third') {
         console.log()
       } else if (tabComponent.name === 'fourth') {
-        console.log()
+        this.queryInOutListBefore(-1)
       }
     },
     async queryInOutListBefore (nDays) {
       if (((!this.inOutList7Days || this.inOutList7Days.length === 0) && nDays === 7) ||
-      (((!this.inOutList1Month || this.inOutList1Month.length === 0) && nDays === 30))) {
+      (((!this.inOutList1Month || this.inOutList1Month.length === 0) && nDays === 30)) ||
+      nDays === -1) {
         const result = await this.$http.get('/getIncomeExpenseDateBefore?nDays=' + nDays)
         if (result.status !== 200) {
           return this.$message.error('failed to load recent Days')
@@ -460,6 +462,8 @@ export default {
           this.inOutList7Days = result.data.result
         } else if (nDays === 30) {
           this.inOutList1Month = result.data.result
+        } else if (nDays === -1) {
+          this.inOutListAllDays = result.data.result
         }
         this.$message.success('query Income/Expense list successfully')
       }
@@ -469,6 +473,9 @@ export default {
       } else if (nDays === 30) {
         this.processDataAnalysisLeft(this.inOutList1Month, 'left-1month')
         this.processDataAnalysisRight(this.inOutList1Month, 'right-1month')
+      } else if (nDays === -1) {
+        this.processDataAnalysisLeft(this.inOutListAllDays, 'left-all')
+        this.processDataAnalysisRight(this.inOutListAllDays, 'right-all')
       }
     },
     processDataAnalysisLeft (inOutList, divName) {
