@@ -20,7 +20,7 @@
         <div class="inlint-div">
           <el-button type="primary" @click="showAddDialog" plain
           icon="el-icon-circle-plus-outline">Add New In&Out</el-button>
-          <el-button type="success" @click="exportUserExcel" plain icon="el-icon-download">Export Excel</el-button>
+          <el-button type="success" @click="exportIncomeExpenseExcel" plain icon="el-icon-download">Export Excel</el-button>
         </div>
       </div>
       <el-table :data="inOutList" border stripe empty-text="no data">
@@ -601,7 +601,26 @@ export default {
       }
       myBarChart.setOption(option)
     },
-    exportUserExcel () {},
+    async exportIncomeExpenseExcel () {
+      const result = await this.$http.get('/exportIncomeExpenseExcel', {
+        responseType: 'blob'
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to export income/expense excel')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      const blob = new Blob([result.data], {
+        type: 'application/vnd.ms-excel'
+      })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'income-expense-information.xls'
+      a.click()
+      window.URL.revokeObjectURL(url)
+    },
     async getInOutListForAnalysis () {
       const result = await this.$http.post('/getIncomeExpenseListInDateSpan', {
         startTime: this.dateRangeForAnalysis[0],
