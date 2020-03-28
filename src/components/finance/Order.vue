@@ -368,8 +368,8 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      this.orderList = result.data.result
-      this.total = this.orderList.length
+      this.orderList = result.data.result.list
+      this.total = result.data.result.total
       // console.log(this.orderList)
     },
     // dataRange 是一个二元数组，第一个值是startDate, 第二个值是endDate

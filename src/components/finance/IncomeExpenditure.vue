@@ -303,6 +303,7 @@ export default {
     this.getIncomeExpenseList()
   },
   methods: {
+    // 返回的Result<PageInfo<IncomeExpenseDTO>>
     async getIncomeExpenseList () {
       const result = await this.$http.post('/getIncomeExpenseList', {
         info: this.queryInfo.info,
@@ -317,8 +318,8 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      this.inOutList = result.data.result
-      this.total = this.inOutList.length
+      this.inOutList = result.data.result.list
+      this.total = result.data.result.total
     },
     async showAddDialog () {
       this.addDialogVisible = true
@@ -394,9 +395,11 @@ export default {
     },
     handleSizeChange (newSize) {
       this.queryInfo.pageSize = newSize
+      this.getIncomeExpenseList()
     },
     handleCurrentChange (newNum) {
-      this.queryInfo.newNum = newNum
+      this.queryInfo.pageNum = newNum
+      this.getIncomeExpenseList()
     },
     showEditDialog (inOutData) {
       this.editDialogVisible = true
