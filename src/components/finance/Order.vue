@@ -80,8 +80,8 @@
             </div>
           </div>
           <div class="order-tail">
-            <el-button type="primary" plain size="medium" @click="showEditDialog(item)">Edit</el-button>
-            <el-button type="danger" plain size="medium" @click="showDeleteDialog(item)">Delete</el-button>
+            <el-button type="primary" plain size="small" @click="showEditDialog(item)">Edit</el-button>
+            <el-button type="danger" plain size="small" @click="showDeleteDialog(item)">Delete</el-button>
           </div>
         </div>
       </div>
@@ -160,10 +160,11 @@
             <el-option
               v-for="item in goodsList"
               :key="item.goodsId"
-              :label="item.goodsName | sub-goods-name(50)"
-              :value="item.goodsId">
-              <span style="float: left">{{ item.goodsName|sub-goods-name(50)}}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.goodsId }}</span>
+              :label="item.goodsName | sub-goods-name(40)"
+              :value="item.goodsId"
+              :disabled="item.goodsNumber <= 0 ? true : false">
+              <span style="float: left">{{ item.goodsName|sub-goods-name(40)}}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">stock: {{ item.goodsNumber }}</span>
             </el-option>
           </el-select>
         </el-form-item>
