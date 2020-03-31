@@ -12,6 +12,7 @@ import AddGoods from '../components/finance/AddGoods.vue'
 import Order from '../components/finance/Order.vue'
 import Data from '../components/data/Data.vue'
 import IncomeExpenditure from '../components/finance/IncomeExpenditure.vue'
+import Prayer from '../components/prayer/Prayers.vue'
 
 Vue.use(VueRouter)
 
@@ -32,7 +33,8 @@ const routes = [
       { path: '/orders', component: Order },
       { path: '/data', component: Data },
       { path: '/incomeExpenditure', component: IncomeExpenditure },
-      { path: '/goods/add', component: AddGoods }
+      { path: '/goods/add', component: AddGoods },
+      { path: '/prayers', component: Prayer }
     ]
   }
 ]
