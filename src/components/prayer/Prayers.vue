@@ -337,8 +337,34 @@ export default {
         this.transferNotEnabledList.push(this.notEnabledPrayerList[i].prayerId)
       }
     },
+    async changePrayerStatus (ids, enabled) {
+      const result = await this.$http.post('/changePrayerStatusInList', {
+        ids: ids,
+        enabled: enabled
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to update prayer status')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+    },
     transferPrayer () {
-      console.log(this.transferNotEnabledList)
+      if (this.transferList.length > 0) {
+        var ids = []
+        for (var i = 0; i < this.transferList.length; i++) {
+          if (!this.transferNotEnabledList.includes(this.transferList[i].key)) {
+            ids.push(this.transferList[i].key)
+          }
+        }
+        this.changePrayerStatus(ids, 1)
+      }
+      if (this.transferNotEnabledList.length > 0) {
+        this.changePrayerStatus(this.transferNotEnabledList, 0)
+      }
+      this.transferDialogVisible = false
+      this.getPrayerList(1)
+      this.getPrayerList(0)
     },
     searchPrayers () {}
   }
