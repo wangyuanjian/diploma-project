@@ -9,12 +9,14 @@
       <div class="header-box">
         <div class="inline-div">
           <el-input placeholder="Input name for query" v-model="queryInfo.info" clearable style="width: 50%"></el-input>
-          <el-button type="primary" @click="searchOrders" plain
+          <el-button type="primary" @click="searchPrayers" plain
           icon="el-icon-search" style="margin-left: 15px;">search</el-button>
         </div>
         <div class="inline-div">
           <el-button type="warning" @click="exportPrayerToWord" plain
           icon="el-icon-download" class="add-btn">Export Word</el-button>
+          <el-button type="danger" @click="showTransferDialog" plain
+          icon="el-icon-sort" class="add-btn">Transfer Prayer</el-button>
           <el-button type="success" @click="showAddDialog" plain
           icon="el-icon-circle-plus-outline" class="add-btn">Add New Prayer</el-button>
         </div>
@@ -36,7 +38,7 @@
               <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="delete prayer" placement="top">
-              <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row)" icon="el-icon-delete"></el-button>
+              <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index)" icon="el-icon-delete"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -88,6 +90,45 @@
         <el-button type="primary" @click="addPrayer" size="medium">Add</el-button>
       </span>
     </el-dialog>
+    <!-- edit User -->
+    <el-dialog
+      title="Edit Prayer"
+      :visible.sync="editDialogVisible"
+      width="40%" @close="editDialogClose">
+
+      <el-form :model="editForm" :rules="editFormRules"
+      ref="editFormRef" label-width="140px" size="medium">
+        <el-form-item label="Prayer Id">
+          <el-input v-model="editForm.prayerId" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="Prayer Content" prop="prayerContent">
+          <el-input v-model="editForm.prayerContent" type="textarea" :rows="2"></el-input>
+        </el-form-item>
+        <el-form-item label="Prayer Date" prop="prayerDate">
+          <el-date-picker v-model="editForm.prayerDate" type="date" placeholder="select date"
+          class="add-date-picker" value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false" size="medium">Cancel</el-button>
+        <el-button type="primary" @click="editPrayer" size="medium">Edit</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="Transfer Prayer"
+      :visible.sync="transferDialogVisible"
+      width="40%">
+      <!-- data 是左右两遍的集合,而v-model绑定的是右边的集合 -->
+      <el-transfer v-model="transferNotEnabledList" :data="transferList"
+      :titles="['Week Prayers', 'History Prayers']" empty-text="no data"></el-transfer>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="transferDialogVisible = false" size="medium">Cancel</el-button>
+        <el-button type="primary" @click="transferPrayer" size="medium">Transfer</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -113,8 +154,30 @@ export default {
       addFormRules: {
         prayerContent: [
           { required: true, message: 'content is necessary', trigger: 'blur' }
+        ],
+        prayerDate: [
+          { required: true, message: 'date is necessary', trigger: 'blur' }
         ]
-      }
+      },
+      editDialogVisible: false,
+      editForm: {
+        prayerId: 0,
+        prayerContent: '',
+        prayerDate: ''
+      },
+      editFormRules: {
+        prayerContent: [
+          { required: true, message: 'content is necessary', trigger: 'blur' }
+        ],
+        prayerDate: [
+          { required: true, message: 'date is necessary', trigger: 'blur' }
+        ]
+      },
+      transferDialogVisible: false,
+      // transferList 是有效和无效prayer的list
+      transferList: [],
+      // transferNotEnabledList 是无效的，里面保存的是prayer 的prayerId
+      transferNotEnabledList: []
     }
   },
   created () {
@@ -182,13 +245,102 @@ export default {
       this.queryInfo.pageNum = newNum
       this.getPrayerList(0)
     },
-    showEditDialog (prayerData) {},
-    showDeleteDialog (prayerData) {},
+    showEditDialog (prayerData) {
+      this.editDialogVisible = true
+      this.editForm.prayerId = prayerData.prayerId
+      this.editForm.prayerContent = prayerData.prayerContent
+      this.editForm.prayerDate = prayerData.prayerDate
+    },
+    editPrayer () {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error('invalid prayer info')
+        }
+        const result = await this.$http.post('/editPrayer', {
+          prayerContent: this.editForm.prayerContent,
+          prayerDate: this.editForm.prayerDate,
+          prayerId: this.editForm.prayerId
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to update prayer')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.editDialogVisible = false
+        this.$message.success('edit prayer successfully')
+        // Update list
+        // for (var i = 0; i < this.enabledPrayerList.length; i++) {
+        //   if (this.enabledPrayerList[i].prayerId === result.data.result.prayerId) {
+        //     this.enabledPrayerList[i] = result.data.result
+        //     break
+        //   }
+        // }
+        this.getPrayerList(1)
+      })
+    },
+    editDialogClose () {
+      this.$refs.editFormRef.resetFields()
+    },
+    showDeleteDialog (prayerData, index) {
+      this.$confirm('[' + prayerData.prayerContent + '] will be deleted, Continue?', 'Tips', {
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async what => {
+        const result = await this.$http.post('/disenablePrayer', {
+          prayerId: prayerData.prayerId,
+          prayerContent: prayerData.prayerContent,
+          prayerDate: prayerData.prayerDate,
+          enabled: 0,
+          createTime: prayerData.createTime,
+          updateTime: prayerData.updateTime
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to pop prayer of week list')
+        } else if (!result.data.success) {
+          return this.$message.error(result.data.errorMessage)
+        } else {
+          this.$message.success('prayer popped')
+          this.enabledPrayerList.splice(index, 1)
+          this.notEnabledPrayerList.unshift(result.data.result)
+          this.getPrayerList(0)
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'pop prayer cancelled'
+        })
+      })
+    },
     enabledPrayerSelected (selection, row) {
       console.log(selection)
       console.log(row)
     },
-    exportPrayerToWord () {}
+    exportPrayerToWord () {},
+    showTransferDialog () {
+      this.transferList = []
+      this.transferNotEnabledList = []
+      this.transferDialogVisible = true
+      // 在打开dialog的时候就要构造数据
+      for (var i = 0; i < this.enabledPrayerList.length; i++) {
+        this.transferList.push({
+          key: this.enabledPrayerList[i].prayerId,
+          label: this.enabledPrayerList[i].prayerContent
+        })
+      }
+      for (i = 0; i < this.notEnabledPrayerList.length; i++) {
+        this.transferList.push({
+          key: this.notEnabledPrayerList[i].prayerId,
+          label: this.notEnabledPrayerList[i].prayerContent
+        })
+        this.transferNotEnabledList.push(this.notEnabledPrayerList[i].prayerId)
+      }
+    },
+    transferPrayer () {
+      console.log(this.transferNotEnabledList)
+    },
+    searchPrayers () {}
   }
 }
 </script>
