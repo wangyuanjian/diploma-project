@@ -317,7 +317,27 @@ export default {
       console.log(selection)
       console.log(row)
     },
-    exportPrayerToWord () {},
+    async exportPrayerToWord () {
+      const result = await this.$http.get('/exportPrayerOfWeekWord', {
+        responseType: 'blob'
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to export prayer word file')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      // 修改第一处
+      const blob = new Blob([result.data], {
+        type: 'application/vnd.ms-word'
+      })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'prayer-of-week.docx'
+      a.click()
+      window.URL.revokeObjectURL(url)
+    },
     showTransferDialog () {
       this.transferList = []
       this.transferNotEnabledList = []
