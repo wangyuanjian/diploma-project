@@ -2,7 +2,7 @@
   <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">Index</el-breadcrumb-item>
-      <el-breadcrumb-item>Prayer</el-breadcrumb-item>
+      <el-breadcrumb-item>Routine</el-breadcrumb-item>
       <el-breadcrumb-item>Prayers</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
@@ -23,7 +23,8 @@
       </div>
       <div class="enabled-prayers prayers">
         <div>
-          <span class="display-title">Prayers Of Week</span>
+          <span class="display-title">Prayers Of Week </span>
+          <span>less than 100</span>
         </div>
         <el-table border stripe :data="enabledPrayerList" empty-text="no data"
         @select="enabledPrayerSelected">
@@ -33,15 +34,15 @@
           <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
           <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
           <el-table-column label="Operation" align="center" width="150">
-          <template slot-scope="scope">
-            <el-tooltip effect="dark" content="edit prayer" placement="top">
-              <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
-            </el-tooltip>
-            <el-tooltip effect="dark" content="delete prayer" placement="top">
-              <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index)" icon="el-icon-delete"></el-button>
-            </el-tooltip>
-          </template>
-        </el-table-column>
+            <template slot-scope="scope">
+              <el-tooltip effect="dark" content="edit prayer" placement="top">
+                <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="to history prayer" placement="top">
+                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-caret-bottom"></el-button>
+              </el-tooltip>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
       <div class="enabled-prayers prayers">
@@ -55,6 +56,13 @@
           <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
           <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
           <el-table-column label="Update Time" prop="updateTime" width="120px" align="center"></el-table-column>
+          <el-table-column label="Operation" align="center" width="150">
+            <template slot-scope="scope">
+              <el-tooltip effect="dark" content="to prayer of week" placement="top">
+                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 1)" icon="el-icon-caret-top"></el-button>
+              </el-tooltip>
+            </template>
+          </el-table-column>
         </el-table>
         <el-pagination
           @size-change="handleSizeChange"
@@ -188,8 +196,10 @@ export default {
     async getPrayerList (enabled) {
       if (enabled === 1) {
         this.queryInfo.pageSize = 100
+        this.queryInfo.enabled = 1
       } else {
         this.queryInfo.enabled = 0
+        this.queryInfo.pageSize = 10
       }
       const result = await this.$http.post('/getPrayerList', {
         info: this.queryInfo.info,
@@ -282,8 +292,14 @@ export default {
     editDialogClose () {
       this.$refs.editFormRef.resetFields()
     },
-    showDeleteDialog (prayerData, index) {
-      this.$confirm('[' + prayerData.prayerContent + '] will be deleted, Continue?', 'Tips', {
+    showDeleteDialog (prayerData, index, enabled) {
+      var msg = '[' + prayerData.prayerContent + '] will be moved to '
+      if (enabled === 1) {
+        msg = msg + ' prayer of week, Continue?'
+      } else {
+        msg = msg + ' history prayer, Continue?'
+      }
+      this.$confirm(msg, 'Warning', {
         confirmButtonText: 'Continue',
         cancelButtonText: 'Cancel',
         type: 'warning'
@@ -292,7 +308,7 @@ export default {
           prayerId: prayerData.prayerId,
           prayerContent: prayerData.prayerContent,
           prayerDate: prayerData.prayerDate,
-          enabled: 0,
+          enabled: enabled,
           createTime: prayerData.createTime,
           updateTime: prayerData.updateTime
         })
@@ -302,8 +318,7 @@ export default {
           return this.$message.error(result.data.errorMessage)
         } else {
           this.$message.success('prayer popped')
-          this.enabledPrayerList.splice(index, 1)
-          this.notEnabledPrayerList.unshift(result.data.result)
+          this.getPrayerList(1)
           this.getPrayerList(0)
         }
       }).catch(() => {
