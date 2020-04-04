@@ -597,13 +597,6 @@ export default {
   display: inline-block;
   margin-left: 15px;
 }
-.button-border {
-  border: solid 1px #dcdfe6;
-  border-radius: 4px;
-  padding: 8px 20px;
-  font-size: 14px;
-  line-height: 1;
-}
 .detail-item {
   margin-top: 15px;
   display: inline-block;

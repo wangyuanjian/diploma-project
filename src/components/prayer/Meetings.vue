@@ -49,6 +49,9 @@
                 <el-form-item label="Remark">
                   <span>{{ scope.row.remark }}</span>
                 </el-form-item>
+                <el-form-item label="Users">
+                  <span v-for="item in scope.row.users" :key="item.userId" class="button-border">{{ item.username }}</span>
+                </el-form-item>
               </el-form>
             </template>
           </el-table-column>
@@ -58,14 +61,14 @@
           <el-table-column label="Begin Time" prop="beginTime" width="110px" align="center"></el-table-column>
           <el-table-column label="End Time" prop="endTime" align="center" width="110px"></el-table-column>
           <el-table-column label="Location" prop="location" align="center" width="100"></el-table-column>
-          <el-table-column label="Type" prop="type" align="center"></el-table-column>
-          <el-table-column label="Operaion">
+          <el-table-column label="Type" prop="type" align="center" width="130"></el-table-column>
+          <el-table-column label="Operaion" align="center" width="120">
             <template slot-scope="scope" align="center">
               <el-tooltip effect="dark" content="edit meeting" placement="top">
                 <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
               </el-tooltip>
               <el-tooltip effect="dark" content="delete meeting" placement="top">
-                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-caret-bottom"></el-button>
+                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
               </el-tooltip>
             </template>
           </el-table-column>
@@ -143,6 +146,68 @@
         <el-button type="primary" @click="addMeeting" size="medium">Add</el-button>
       </span>
     </el-dialog>
+    <!-- Edit Prayer -->
+    <el-dialog
+      title="Edit Meeing"
+      :visible.sync="editDialogVisible"
+      width="40%" @close="editDialogClose">
+
+      <el-form :model="editForm" :rules="editFormRules"
+      ref="editFormRef" label-width="110px" size="medium">
+        <el-form-item label="Theme" prop="theme">
+          <el-input v-model="editForm.theme"></el-input>
+        </el-form-item>
+        <el-form-item label="Location" prop="location">
+          <el-input v-model="editForm.location"></el-input>
+        </el-form-item>
+        <el-form-item label="Participants" prop="people">
+          <el-select v-model="editForm.people" size="medium"
+            :multiple="true" placeholder="select participants" class="select-option"
+            @change="selectedUserChangedforEdit">
+            <el-option
+              v-for="item in userList"
+              :key="item.userId"
+              :label="item.username"
+              :value="item.userId">
+              <span style="float: left">{{ item.username }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">id : {{ item.userId }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Total" prop="total">
+          <el-input v-model="editForm.total" type="number" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="Types" prop="type">
+          <el-select v-model="editForm.type" size="medium"
+            :multiple="false" placeholder="select meeting types" class="select-option">
+            <el-option
+              v-for="item in meetingTypes"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Begin Time" prop="beginTime">
+          <el-date-picker v-model="editForm.beginTime" type="datetime" placeholder="select begin time"
+          class="add-date-picker" value-format="yyyy-MM-dd HH:mm:ss">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="End Time" prop="endTime">
+          <el-date-picker v-model="editForm.endTime" type="datetime" placeholder="select end time"
+          class="add-date-picker" value-format="yyyy-MM-dd HH:mm:ss">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="Remark">
+          <el-input v-model="editForm.remark"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false" size="medium">Cancel</el-button>
+        <el-button type="primary" @click="editMeeting" size="medium">Edit</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -159,19 +224,19 @@ export default {
       },
       total: 0,
       meetingTypes: [{
-        value: 'type1',
+        value: 'on-site meeting',
         label: 'on-site meeting'
       }, {
-        value: 'type2',
+        value: 'network meeting',
         label: 'network meeting'
       }, {
-        value: 'type3',
+        value: 'phone meeting',
         label: 'phone meeting'
       }, {
-        value: 'type4',
+        value: 'annual meeting',
         label: 'annual meeting'
       }, {
-        value: 'type5',
+        value: 'other meeting',
         label: 'other meeting'
       }],
       addDialogVisible: false,
@@ -204,11 +269,25 @@ export default {
         location: [
           { required: true, message: 'location is necessary', trigger: 'blur' }
         ]
-      }
+      },
+      editDialogVisible: false,
+      editForm: {
+        meetingId: 0,
+        theme: '',
+        total: 0,
+        people: [],
+        type: '',
+        location: '',
+        beginTime: '',
+        endTime: '',
+        remark: ''
+      },
+      editFormRules: {}
     }
   },
   created () {
     this.getMeetingList()
+    this.getUserList()
   },
   methods: {
     async getMeetingList () {
@@ -282,9 +361,57 @@ export default {
       // console.log(changedUser)
       this.addForm.total = changedUser.length
     },
-    showEditDialog () {},
+    showEditDialog (meetingData) {
+      this.editDialogVisible = true
+      this.editForm.meetingId = meetingData.meetingId
+      this.editForm.theme = meetingData.theme
+      this.editForm.total = meetingData.total
+      this.editForm.type = meetingData.type
+      this.editForm.location = meetingData.location
+      this.editForm.beginTime = meetingData.beginTime
+      this.editForm.endTime = meetingData.endTime
+      this.editForm.remark = meetingData.remark
+      var ids = []
+      for (var i = 0; i < meetingData.users.length; i++) {
+        ids.push(meetingData.users[i].userId)
+      }
+      this.editForm.people = ids
+    },
+    editMeeting () {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error('invalid meeting info')
+        }
+        const result = await this.$http.post('/updateMeeting', {
+          meetingId: this.editForm.meetingId,
+          theme: this.editForm.theme,
+          total: this.editForm.total,
+          type: this.editForm.type,
+          location: this.editForm.location,
+          beginTime: this.editForm.beginTime,
+          endTime: this.editForm.endTime,
+          remark: this.editForm.remark,
+          people: this.editForm.people.join(',')
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to update meeting info')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.editDialogVisible = false
+        this.$message.success('edit meeting successfully')
+        this.getMeetingList()
+      })
+    },
+    editDialogClose () {
+      this.$refs.editFormRef.resetFields()
+    },
     showDeleteDialog () {},
-    searchMeetings () {}
+    searchMeetings () {},
+    selectedUserChangedforEdit (changedUser) {
+      this.editForm.total = changedUser.length
+    }
   }
 }
 </script>
@@ -314,5 +441,16 @@ export default {
 }
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+}
+.button-border {
+  border: solid 1px #dcdfe6;
+  border-radius: 4px;
+  padding: 5px 5px;
+  font-size: 14px;
+  line-height: 1;
+  margin-right: 5px;
+}
+.el-select {
+  width: 100%;
 }
 </style>
