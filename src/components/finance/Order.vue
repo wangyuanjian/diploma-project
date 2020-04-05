@@ -524,7 +524,7 @@ export default {
     showDeleteDialog (orderData) {
       const deleteMsg = 'order [' + orderData.orderId + '] by user ' +
         orderData.username + ' will be deleted, Continue?'
-      this.$confirm(deleteMsg, 'Delete Category', {
+      this.$confirm(deleteMsg, 'Delete Order', {
         confirmButtonText: 'Continue',
         cancelButtonText: 'Cancel',
         type: 'warning'

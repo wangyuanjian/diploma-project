@@ -83,6 +83,23 @@
           :total="total">
         </el-pagination>
       </div>
+      <div>
+        <p>
+          <span class="display-title">Data Statistics</span>
+        </p>
+        <el-tabs @tab-click="handleTabClick">
+          <el-tab-pane label="Last Month" name="first">
+            <div>
+              <div id="last-month" class="echarts-div"></div>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="Last Year" name="second">
+            <div>
+              <div id="last-year" class="echarts-div"></div>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
     </el-card>
     <!-- Add Prayer -->
     <el-dialog
@@ -407,10 +424,43 @@ export default {
     editDialogClose () {
       this.$refs.editFormRef.resetFields()
     },
-    showDeleteDialog () {},
+    showDeleteDialog (meetingData) {
+      const deleteMsg = 'meeting about [' + meetingData.theme + '] ' + ' will be deleted, Continue?'
+      this.$confirm(deleteMsg, 'Delete Meeting', {
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async what => {
+        const result = await this.$http.post('/deleteMeeting', {
+          meetingId: meetingData.meetingId
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to delete meeting')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.$message.success('delete meeting sucessfully')
+        this.getMeetingList()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'delete category cancelled'
+        })
+      })
+    },
     searchMeetings () {},
     selectedUserChangedforEdit (changedUser) {
       this.editForm.total = changedUser.length
+    },
+    // tabComponent 是VueComponent实例，可通过index或者name
+    // 判断具体点击的Tab
+    handleTabClick (tabComponent) {
+      if (tabComponent.name === 'first') {
+        this.queryInOutListBefore(7)
+      } else if (tabComponent.name === 'second') {
+        console.log('this')
+      }
     }
   }
 }
@@ -452,5 +502,9 @@ export default {
 }
 .el-select {
   width: 100%;
+}
+.echarts-div {
+  width: 100%;
+  height: 100%;
 }
 </style>

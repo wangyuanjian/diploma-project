@@ -299,7 +299,7 @@ export default {
       } else {
         msg = msg + ' history prayer, Continue?'
       }
-      this.$confirm(msg, 'Warning', {
+      this.$confirm(msg, 'Delete Prayer', {
         confirmButtonText: 'Continue',
         cancelButtonText: 'Cancel',
         type: 'warning'
