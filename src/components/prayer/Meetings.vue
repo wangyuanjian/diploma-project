@@ -83,7 +83,7 @@
           :total="total">
         </el-pagination>
       </div>
-      <div>
+      <div class="data-box">
         <p>
           <span class="display-title">Data Statistics</span>
         </p>
@@ -506,5 +506,13 @@ export default {
 .echarts-div {
   width: 100%;
   height: 100%;
+  border: 3px dashed tomato;
+}
+.display-title {
+  font-size: 35px;
+  font-weight: bold;
+}
+.data-box {
+  margin-top: 70px;
 }
 </style>
