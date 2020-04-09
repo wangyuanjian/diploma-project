@@ -90,7 +90,9 @@
         <el-tabs @tab-click="handleTabClick">
           <el-tab-pane label="Last Month" name="first">
             <div>
-              <div id="last-month" class="echarts-div"></div>
+              <div id="last-month" class="echarts-div">
+                <pre>{{meetingList1Month}}</pre>
+              </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="Last Year" name="second">
@@ -233,6 +235,9 @@ export default {
   data () {
     return {
       meetingList: [],
+      meetingList7Days: [],
+      meetingList1Month: [],
+      meetingList1Quarter: [],
       userList: [],
       queryInfo: {
         info: '',
@@ -457,9 +462,31 @@ export default {
     // 判断具体点击的Tab
     handleTabClick (tabComponent) {
       if (tabComponent.name === 'first') {
-        this.queryInOutListBefore(7)
+        this.queryMeetingListBefore(30)
       } else if (tabComponent.name === 'second') {
         console.log('this')
+      }
+    },
+    async queryMeetingListBefore (nDays) {
+      if (((!this.meetingList7Days || this.meetingList7Days.length === 0) && nDays === 7) ||
+      ((!this.meetingList1Month || this.meetingList1Month.length === 0) && nDays === 30) ||
+      ((!this.meetingList1Quarter || this.meetingList1Quarter.length === 0) && nDays === 90) ||
+      nDays === -1) {
+        const result = await this.$http.get('/getMeetingDateBefore?nDays=' + nDays)
+        if (result.status !== 200) {
+          return this.$message.error('failed to load recent Days')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        if (nDays === 7) {
+          this.meetingList7Days = result.data.result
+        } else if (nDays === 30) {
+          this.meetingList1Month = result.data.result
+        } else if (nDays === -1) {
+          this.meetingList1Quarter = result.data.result
+        }
+        this.$message.success('query meeting list successfully')
       }
     }
   }
