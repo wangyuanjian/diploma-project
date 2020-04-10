@@ -88,16 +88,70 @@
           <span class="display-title">Data Statistics</span>
         </p>
         <el-tabs @tab-click="handleTabClick">
-          <el-tab-pane label="Last Month" name="first">
+          <el-tab-pane label="Last Week" name="first">
             <div>
-              <div id="last-month" class="echarts-div">
+              <div id="form-data" class="block-display">
+                <p>
+                  <span class="form-title">Meeting Number: </span>
+                  <span class="form-content">{{meetingList7Days.meetingNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total AA Number: </span>
+                  <span class="form-content">{{meetingList7Days.totalNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Number: </span>
+                  <span class="form-content">{{meetingList7Days.avgNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total Time: </span>
+                  <span class="form-content">{{meetingList7Days.totalTime}}(min)</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Time: </span>
+                  <span class="form-content">{{meetingList7Days.avgTime}}(min)</span>
+                </p>
+              </div>
+              <div id="last-week" class="echarts-div">
                 <pre>{{meetingList1Month}}</pre>
               </div>
             </div>
           </el-tab-pane>
-          <el-tab-pane label="Last Year" name="second">
+          <el-tab-pane label="Last Month" name="second">
             <div>
-              <div id="last-year" class="echarts-div"></div>
+              <div id="form-data" class="block-display temp-border">
+                <p>
+                  <span class="form-title">Meeting Number: </span>
+                  <span class="form-content">{{meetingList1Month.meetingNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total AA Number: </span>
+                  <span class="form-content">{{meetingList1Month.totalNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Number: </span>
+                  <span class="form-content">{{meetingList1Month.avgNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total Time: </span>
+                  <span class="form-content">{{meetingList1Month.totalTime}}(min)</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Time: </span>
+                  <span class="form-content">{{meetingList1Month.avgTime}}(min)</span>
+                </p>
+              </div>
+              <div id="last-month" class="echarts-div"></div>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="Last Quarter" name="third">
+            <div>
+              <div id="last-quarter" class="echarts-div"></div>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane label="Customed Time Span" name="fourth">
+            <div>
+              <div id="last-custom" class="echarts-div"></div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -235,9 +289,9 @@ export default {
   data () {
     return {
       meetingList: [],
-      meetingList7Days: [],
-      meetingList1Month: [],
-      meetingList1Quarter: [],
+      meetingList7Days: '',
+      meetingList1Month: '',
+      meetingList1Quarter: '',
       userList: [],
       queryInfo: {
         info: '',
@@ -462,9 +516,11 @@ export default {
     // 判断具体点击的Tab
     handleTabClick (tabComponent) {
       if (tabComponent.name === 'first') {
-        this.queryMeetingListBefore(30)
+        this.queryMeetingListBefore(7)
       } else if (tabComponent.name === 'second') {
-        console.log('this')
+        this.queryMeetingListBefore(30)
+      } else if (tabComponent.name === 'third') {
+        this.queryMeetingListBefore(90)
       }
     },
     async queryMeetingListBefore (nDays) {
@@ -481,6 +537,7 @@ export default {
         }
         if (nDays === 7) {
           this.meetingList7Days = result.data.result
+          // console.log(this.meetingList7Days.meetingNumber)
         } else if (nDays === 30) {
           this.meetingList1Month = result.data.result
         } else if (nDays === -1) {
@@ -541,5 +598,16 @@ export default {
 }
 .data-box {
   margin-top: 70px;
+}
+.block-display {
+  display: inline-block;
+}
+.form-title {
+  color: #99a9bf;
+  font-size: 15px;
+  font-weight: bold;
+}
+.temp-border {
+  border: 3px dashed tomato;
 }
 </style>
