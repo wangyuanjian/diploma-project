@@ -112,8 +112,11 @@
                   <span class="form-content">{{meetingList7Days.avgTime}}(min)</span>
                 </p>
               </div>
+              <div id="last-week-users" class="echarts-div"></div>
+              <div id="last-week-locations" class="echarts-div"></div>
+              <div id="last-week-types" class="echarts-div"></div>
               <div id="last-week" class="echarts-div">
-                <pre>{{meetingList1Month}}</pre>
+                <pre>{{meetingList7Days}}</pre>
               </div>
             </div>
           </el-tab-pane>
@@ -285,6 +288,7 @@
 </template>
 
 <script>
+import echarts from 'echarts'
 export default {
   data () {
     return {
@@ -538,6 +542,12 @@ export default {
         if (nDays === 7) {
           this.meetingList7Days = result.data.result
           // console.log(this.meetingList7Days.meetingNumber)
+          this.processMeetingUsersOrLocations(this.meetingList7Days.users, 'last-week-users',
+            'AA Attendence in Last Week', 'SubText Title', 'AA')
+          this.processMeetingTypes(this.meetingList7Days.types, 'last-week-types',
+            'AA Meeting Types in Last Week', 'SubText Title', 'Types')
+          this.processMeetingUsersOrLocations(this.meetingList7Days.locations, 'last-week-locations',
+            'AA Meeting Locations in Last Week', 'SubText Title', 'Locations')
         } else if (nDays === 30) {
           this.meetingList1Month = result.data.result
         } else if (nDays === -1) {
@@ -545,6 +555,116 @@ export default {
         }
         this.$message.success('query meeting list successfully')
       }
+    },
+    processMeetingTypes (list, divName, title, subText, legend) {
+      // meeting users name list, system user excluded
+      var xs = []
+      var ys = []
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].value !== 'system') {
+          xs.push(list[i].value)
+          ys.push(list[i].number)
+        }
+      }
+      var myBarChart = echarts.init(document.getElementById(divName))
+      var option = {
+        title: {
+          text: title,
+          subText: subText,
+          left: 'center',
+          textStyle: {
+            fontSize: 20
+          }
+        },
+        legend: {
+          data: [legend],
+          right: 10,
+          top: 10,
+          orient: 'vertical'
+        },
+        toolbox: {
+          y: 'bottom',
+          feature: {
+            saveAsImage: {
+              pixelRatio: 2
+            }
+          }
+        },
+        grid: {
+          left: '18%',
+          bottom: '38%'
+        },
+        xAxis: {
+          data: xs,
+          axisLabel: {
+            interval: 0,
+            rotate: 45
+          }
+        },
+        yAxis: {
+          splitNumber: 1
+        },
+        series: [{
+          name: legend,
+          data: ys,
+          type: 'bar'
+        }]
+      }
+      myBarChart.setOption(option)
+    },
+    processMeetingUsersOrLocations (list, divName, title, subText, legend) {
+      var xs = []
+      var ys = []
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].value !== 'system') {
+          xs.push(list[i].value)
+          ys.push(list[i].number)
+        }
+      }
+      var myBarChart = echarts.init(document.getElementById(divName))
+      var option = {
+        title: {
+          text: title,
+          subText: subText,
+          left: 'center',
+          textStyle: {
+            fontSize: 20
+          }
+        },
+        legend: {
+          data: [legend],
+          right: 10,
+          top: 10,
+          orient: 'vertical'
+        },
+        toolbox: {
+          y: 'bottom',
+          feature: {
+            saveAsImage: {
+              pixelRatio: 2
+            }
+          }
+        },
+        xAxis: {
+          data: xs,
+          axisLabel: {
+            interval: 0,
+            rotate: 45
+          },
+          axisTick: {
+            length: 1
+          }
+        },
+        yAxis: {
+          splitNumber: 1
+        },
+        series: [{
+          name: legend,
+          data: ys,
+          type: 'bar'
+        }]
+      }
+      myBarChart.setOption(option)
     }
   }
 }
@@ -589,8 +709,9 @@ export default {
 }
 .echarts-div {
   width: 100%;
-  height: 100%;
+  height: 500px;
   border: 3px dashed tomato;
+  overflow: scroll;
 }
 .display-title {
   font-size: 35px;
