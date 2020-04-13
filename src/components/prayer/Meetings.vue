@@ -83,6 +83,14 @@
           :total="total">
         </el-pagination>
       </div>
+      <div class="type-box">
+        <el-collapse v-model="activeNames" @change="handleChange">
+          <el-collapse-item title="一致性 Consistency" name="1">
+            <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+            <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
       <div class="data-box">
         <p>
           <span class="display-title">Data Statistics</span>
@@ -591,8 +599,10 @@ export default {
           }
         },
         grid: {
-          left: '18%',
-          bottom: '38%'
+          left: '5%',
+          bottom: '38%',
+          right: '5%'
+          // width: 'auto'
         },
         xAxis: {
           data: xs,
@@ -661,7 +671,17 @@ export default {
         series: [{
           name: legend,
           data: ys,
-          type: 'bar'
+          type: 'bar',
+          itemStyle: {
+            normal: {
+              // 这里是重点
+              color: function (params) {
+                // 注意，如果颜色太少的话，后面颜色不会自动循环，最好多定义几个颜色
+                var colorList = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622']
+                return colorList[params.dataIndex]
+              }
+            }
+          }
         }]
       }
       myBarChart.setOption(option)

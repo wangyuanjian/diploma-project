@@ -580,7 +580,11 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: dateList
+          data: dateList,
+          axisLabel: {
+            interval: 0,
+            rotate: 45
+          }
         },
         yAxis: {
           type: 'value'
@@ -600,6 +604,14 @@ export default {
           name: 'Diff',
           data: diffList,
           type: 'line'
+        }],
+        dataZoom: [{
+          type: 'slider',
+          show: true,
+          start: 0,
+          end: 30,
+          xAxisIndex: [0],
+          bottom: -10
         }]
       }
       myBarChart.setOption(option)
@@ -690,17 +702,17 @@ export default {
   font-size: 20px !important;
 }
 .left-data {
-  width: 600px;
+  width: 100%;
   height: 400px;
   // display: inline-block;
-  // border: 2px solid orangered;
+  border: 2px solid orangered;
   margin: 0 auto;
 }
 .right-data {
-  width: 800px;
+  width: 100%;
   height: 600px;
   // display: inline-block;
-  // border: 2px solid palevioletred;
+  border: 2px solid palevioletred;
   margin: 0 auto;
 }
 .search-for-analysis-bar {
