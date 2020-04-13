@@ -84,10 +84,48 @@
         </el-pagination>
       </div>
       <div class="type-box">
-        <el-collapse v-model="activeNames" @change="handleChange">
-          <el-collapse-item title="一致性 Consistency" name="1">
-            <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-            <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+        <el-collapse v-model="collapseActiveName" accordion>
+          <el-collapse-item title="Meeting Types" name="types">
+            <div class="table-button-box">
+              <div class="inline-div">
+                <el-table border stripe :data="meetingTypes" empty-text="no data" class="type-table">
+                  <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+                  <el-table-column label="Type" prop="type" align="center"></el-table-column>
+                  <el-table-column label="Operaion" align="center" width="120">
+                    <template slot-scope="scope" align="center">
+                      <el-tooltip effect="dark" content="delete meeting" placement="top">
+                        <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                      </el-tooltip>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+              <div class="inline-div">
+                <el-button type="success" @click="showAddDialog" plain
+                icon="el-icon-circle-plus-outline" class="add-btn">Add Type</el-button>
+              </div>
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="Meeting Locations" name="locations">
+            <div class="table-button-box">
+              <div class="inline-div">
+                <el-table border stripe :data="meetingTypes" empty-text="no data" class="type-table">
+                  <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+                  <el-table-column label="Type" prop="type" align="center"></el-table-column>
+                  <el-table-column label="Operaion" align="center" width="120">
+                    <template slot-scope="scope" align="center">
+                      <el-tooltip effect="dark" content="delete meeting" placement="top">
+                        <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                      </el-tooltip>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+              <div class="inline-div">
+                <el-button type="success" @click="showAddDialog" plain
+                icon="el-icon-circle-plus-outline" class="add-btn">Add Location</el-button>
+              </div>
+            </div>
           </el-collapse-item>
         </el-collapse>
       </div>
@@ -305,28 +343,13 @@ export default {
       meetingList1Month: '',
       meetingList1Quarter: '',
       userList: [],
+      meetingTypes: [],
       queryInfo: {
         info: '',
         pageNum: 1,
         pageSize: 10
       },
       total: 0,
-      meetingTypes: [{
-        value: 'on-site meeting',
-        label: 'on-site meeting'
-      }, {
-        value: 'network meeting',
-        label: 'network meeting'
-      }, {
-        value: 'phone meeting',
-        label: 'phone meeting'
-      }, {
-        value: 'annual meeting',
-        label: 'annual meeting'
-      }, {
-        value: 'other meeting',
-        label: 'other meeting'
-      }],
       addDialogVisible: false,
       addForm: {
         theme: '',
@@ -370,12 +393,33 @@ export default {
         endTime: '',
         remark: ''
       },
-      editFormRules: {}
+      editFormRules: {
+        theme: [
+          { required: true, message: 'theme is necessary', trigger: 'blur' }
+        ],
+        beginTime: [
+          { required: true, message: 'begin time is necessary', trigger: 'blur' }
+        ],
+        endTime: [
+          { required: true, message: 'end time is necessary', trigger: 'blur' }
+        ],
+        people: [
+          { required: true, message: 'people is necessary', trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: 'type is necessary', trigger: 'blur' }
+        ],
+        location: [
+          { required: true, message: 'location is necessary', trigger: 'blur' }
+        ]
+      },
+      collapseActiveName: ''
     }
   },
   created () {
     this.getMeetingList()
     this.getUserList()
+    this.getMeetingTypeList()
   },
   methods: {
     async getMeetingList () {
@@ -403,6 +447,18 @@ export default {
           return this.$message.error(result.data.errorMessage)
         }
         this.userList = result.data.result
+      }
+    },
+    async getMeetingTypeList () {
+      if (!this.meetingTypes || this.meetingTypes.length === 0) {
+        const result = await this.$http.get('/getMeetingTypeList')
+        if (result.status !== 200) {
+          return this.$message.error('failed to load meeting types')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.meetingTypes = result.data.result
       }
     },
     handleSizeChange (newSize) {
@@ -691,7 +747,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.inlint-div {
+.inline-div {
   display: inline-block;
 }
 .header-box {
@@ -750,5 +806,18 @@ export default {
 }
 .temp-border {
   border: 3px dashed tomato;
+}
+.type-box {
+  margin-top: 70px;
+}
+/deep/ .el-collapse-item__header {
+  font-size: 20px;
+}
+.table-button-box {
+  display: flex;
+  justify-content: space-around;
+}
+.type-table {
+  width: 500px;
 }
 </style>
