@@ -218,7 +218,15 @@
           <el-input v-model="addForm.theme"></el-input>
         </el-form-item>
         <el-form-item label="Location" prop="location">
-          <el-input v-model="addForm.location"></el-input>
+          <el-select v-model="addForm.location" size="medium"
+            :multiple="false" placeholder="select location" class="select-option">
+            <el-option
+              v-for="item in meetingLocations"
+              :key="item.location"
+              :label="item.location"
+              :value="item.location">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="Participants" prop="people">
           <el-select v-model="addForm.people" size="medium"
@@ -242,9 +250,9 @@
             :multiple="false" placeholder="select meeting types" class="select-option">
             <el-option
               v-for="item in meetingTypes"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.type"
+              :label="item.type"
+              :value="item.type">
             </el-option>
           </el-select>
         </el-form-item>
@@ -280,7 +288,15 @@
           <el-input v-model="editForm.theme"></el-input>
         </el-form-item>
         <el-form-item label="Location" prop="location">
-          <el-input v-model="editForm.location"></el-input>
+          <el-select v-model="editForm.location" size="medium"
+            :multiple="false" placeholder="select location" class="select-option">
+            <el-option
+              v-for="item in meetingLocations"
+              :key="item.location"
+              :label="item.location"
+              :value="item.location">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="Participants" prop="people">
           <el-select v-model="editForm.people" size="medium"
@@ -304,9 +320,9 @@
             :multiple="false" placeholder="select meeting types" class="select-option">
             <el-option
               v-for="item in meetingTypes"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.type"
+              :label="item.type"
+              :value="item.type">
             </el-option>
           </el-select>
         </el-form-item>
