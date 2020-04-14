@@ -94,14 +94,14 @@
                   <el-table-column label="Operaion" align="center" width="120">
                     <template slot-scope="scope" align="center">
                       <el-tooltip effect="dark" content="delete meeting" placement="top">
-                        <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                        <el-button type="danger" size="small" plain @click="showDeleteTypeDialog(scope.row)" icon="el-icon-delete"></el-button>
                       </el-tooltip>
                     </template>
                   </el-table-column>
                 </el-table>
               </div>
               <div class="inline-div">
-                <el-button type="success" @click="showAddDialog" plain
+                <el-button type="success" @click="showAddMeetingTypeDialog" plain
                 icon="el-icon-circle-plus-outline" class="add-btn">Add Type</el-button>
               </div>
             </div>
@@ -109,20 +109,20 @@
           <el-collapse-item title="Meeting Locations" name="locations">
             <div class="table-button-box">
               <div class="inline-div">
-                <el-table border stripe :data="meetingTypes" empty-text="no data" class="type-table">
+                <el-table border stripe :data="meetingLocations" empty-text="no data" class="type-table">
                   <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-                  <el-table-column label="Type" prop="type" align="center"></el-table-column>
+                  <el-table-column label="Location" prop="location" align="center"></el-table-column>
                   <el-table-column label="Operaion" align="center" width="120">
                     <template slot-scope="scope" align="center">
                       <el-tooltip effect="dark" content="delete meeting" placement="top">
-                        <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                        <el-button type="danger" size="small" plain @click="showDeleteLocationDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
                       </el-tooltip>
                     </template>
                   </el-table-column>
                 </el-table>
               </div>
               <div class="inline-div">
-                <el-button type="success" @click="showAddDialog" plain
+                <el-button type="success" @click="showAddMeetingLocationDialog" plain
                 icon="el-icon-circle-plus-outline" class="add-btn">Add Location</el-button>
               </div>
             </div>
@@ -330,6 +330,42 @@
         <el-button type="primary" @click="editMeeting" size="medium">Edit</el-button>
       </span>
     </el-dialog>
+    <!-- Add Meeting Type -->
+    <el-dialog
+      title="Add Meeing"
+      :visible.sync="addTypeDialogVisible"
+      width="40%" @close="addTypeDialogClose">
+
+      <el-form :model="addTypeForm" :rules="addTypeFormRules"
+      ref="addTypeFormRef" label-width="70px" size="medium">
+        <el-form-item label="Type" prop="type">
+          <el-input v-model="addTypeForm.type"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addTypeDialogVisible = false" size="medium">Cancel</el-button>
+        <el-button type="primary" @click="addMeetingType" size="medium">Add</el-button>
+      </span>
+    </el-dialog>
+    <!-- Add Meeting Location -->
+    <el-dialog
+      title="Add Meeing Location"
+      :visible.sync="addLocationDialogVisible"
+      width="40%" @close="addLocationDialogClose">
+
+      <el-form :model="addLocationForm" :rules="addLocationFormRules"
+      ref="addLocationFormRef" label-width="70px" size="medium">
+        <el-form-item label="Location" prop="location">
+          <el-input v-model="addLocationForm.location"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addLocationDialogVisible = false" size="medium">Cancel</el-button>
+        <el-button type="primary" @click="addMeetingLocation" size="medium">Add</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -344,6 +380,7 @@ export default {
       meetingList1Quarter: '',
       userList: [],
       meetingTypes: [],
+      meetingLocations: [],
       queryInfo: {
         info: '',
         pageNum: 1,
@@ -413,13 +450,32 @@ export default {
           { required: true, message: 'location is necessary', trigger: 'blur' }
         ]
       },
-      collapseActiveName: ''
+      collapseActiveName: '',
+      addTypeDialogVisible: false,
+      addTypeForm: {
+        type: ''
+      },
+      addTypeFormRules: {
+        type: [
+          { required: true, message: 'type is necessary', trigger: 'blur' }
+        ]
+      },
+      addLocationDialogVisible: false,
+      addLocationForm: {
+        location: ''
+      },
+      addLocationFormRules: {
+        location: [
+          { required: true, message: 'location is necessary', trigger: 'blur' }
+        ]
+      }
     }
   },
   created () {
     this.getMeetingList()
     this.getUserList()
     this.getMeetingTypeList()
+    this.getMeetingLocationList()
   },
   methods: {
     async getMeetingList () {
@@ -461,6 +517,18 @@ export default {
         this.meetingTypes = result.data.result
       }
     },
+    async getMeetingLocationList () {
+      if (!this.meetingLocations || this.meetingLocations.length === 0) {
+        const result = await this.$http.get('/getMeetingLocationList')
+        if (result.status !== 200) {
+          return this.$message.error('failed to load meeting locations')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.meetingLocations = result.data.result
+      }
+    },
     handleSizeChange (newSize) {
       this.queryInfo.pageSize = newSize
     },
@@ -499,6 +567,56 @@ export default {
     },
     addDialogClose () {
       this.$refs.addFormRef.resetFields()
+    },
+    showAddMeetingTypeDialog () {
+      this.addTypeDialogVisible = true
+    },
+    addMeetingType () {
+      this.$refs.addTypeFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error('invalid meeting type info')
+        }
+        const result = await this.$http.post('/addMeetingType', {
+          type: this.addTypeForm.type
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to add meeting type')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.addTypeDialogVisible = false
+        this.$message.success('add meeting type successfully')
+        this.meetingTypes = result.data.result
+      })
+    },
+    addTypeDialogClose () {
+      this.$refs.addTypeFormRef.resetFields()
+    },
+    showAddMeetingLocationDialog () {
+      this.addLocationDialogVisible = true
+    },
+    addMeetingLocation () {
+      this.$refs.addLocationFormRef.validate(async valid => {
+        if (!valid) {
+          return this.$message.error('invalid meeting location info')
+        }
+        const result = await this.$http.post('/addMeetingLocation', {
+          location: this.addLocationForm.location
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to add meeting location')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.addLocationDialogVisible = false
+        this.$message.success('add meeting location successfully')
+        this.meetingLocations = result.data.result
+      })
+    },
+    addLocationDialogClose () {
+      this.$refs.addLocationFormRef.resetFields()
     },
     // 数组
     selectedUserChanged (changedUser) {
@@ -572,7 +690,57 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: 'delete category cancelled'
+          message: 'delete meeting cancelled'
+        })
+      })
+    },
+    showDeleteTypeDialog (typeData) {
+      const deleteMsg = 'meeting type [' + typeData.type + '] ' + ' will be deleted, Continue?'
+      this.$confirm(deleteMsg, 'Delete Meeting Type', {
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async what => {
+        const result = await this.$http.post('/deleteMeetingType', {
+          type: typeData.type
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to delete meeting type')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.$message.success('delete meeting type sucessfully')
+        this.meetingTypes = result.data.result
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'delete meeting type cancelled'
+        })
+      })
+    },
+    showDeleteLocationDialog (locationData) {
+      const deleteMsg = 'meeting location [' + locationData.location + '] ' + ' will be deleted, Continue?'
+      this.$confirm(deleteMsg, 'Delete Meeting Location', {
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async what => {
+        const result = await this.$http.post('/deleteMeetingLocation', {
+          location: locationData.location
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to delete meeting location')
+        }
+        if (result.data.success === false) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.$message.success('delete meeting location sucessfully')
+        this.meetingLocations = result.data.result
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'delete meeting location cancelled'
         })
       })
     },
