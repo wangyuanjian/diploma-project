@@ -93,7 +93,7 @@
                   <el-table-column label="Type" prop="type" align="center"></el-table-column>
                   <el-table-column label="Operaion" align="center" width="120">
                     <template slot-scope="scope" align="center">
-                      <el-tooltip effect="dark" content="delete meeting" placement="top">
+                      <el-tooltip effect="dark" content="delete meeting type" placement="top">
                         <el-button type="danger" size="small" plain @click="showDeleteTypeDialog(scope.row)" icon="el-icon-delete"></el-button>
                       </el-tooltip>
                     </template>
@@ -114,7 +114,7 @@
                   <el-table-column label="Location" prop="location" align="center"></el-table-column>
                   <el-table-column label="Operaion" align="center" width="120">
                     <template slot-scope="scope" align="center">
-                      <el-tooltip effect="dark" content="delete meeting" placement="top">
+                      <el-tooltip effect="dark" content="delete meeting location" placement="top">
                         <el-button type="danger" size="small" plain @click="showDeleteLocationDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
                       </el-tooltip>
                     </template>
@@ -200,13 +200,48 @@
           </el-tab-pane>
           <el-tab-pane label="Customed Time Span" name="fourth">
             <div>
-              <div id="last-custom" class="echarts-div"></div>
+             <div class="search-for-analysis-bar">
+                <el-date-picker v-model="dateRangeForAnalysis" type="daterange" range-separator="to"
+                start-placeholder="Start Date" end-placeholder="End Date"
+                format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+                style="margin-left: 15px;"></el-date-picker>
+                <el-button type="primary" @click="getMeetingListInDateSpan" plain
+                icon="el-icon-search" style="margin-left: 15px;">search</el-button>
+              </div>
+              <div id="form-data" class="block-display">
+                <p>
+                  <span class="form-title">Meeting Number: </span>
+                  <span class="form-content">{{meetingListInDateSpan.meetingNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total AA Number: </span>
+                  <span class="form-content">{{meetingListInDateSpan.totalNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Number: </span>
+                  <span class="form-content">{{meetingListInDateSpan.avgNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total Time: </span>
+                  <span class="form-content">{{meetingListInDateSpan.totalTime}}(min)</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Time: </span>
+                  <span class="form-content">{{meetingListInDateSpan.avgTime}}(min)</span>
+                </p>
+              </div>
+              <div id="customed-users" class="echarts-div"></div>
+              <div id="customed-locations" class="echarts-div"></div>
+              <div id="customed-types" class="echarts-div"></div>
+              <div id="last-week" class="echarts-div">
+                <pre>{{meetingListInDateSpan}}</pre>
+              </div>
             </div>
           </el-tab-pane>
         </el-tabs>
       </div>
     </el-card>
-    <!-- Add Prayer -->
+    <!-- Add Meeting -->
     <el-dialog
       title="Add Meeing"
       :visible.sync="addDialogVisible"
@@ -394,6 +429,8 @@ export default {
       meetingList7Days: '',
       meetingList1Month: '',
       meetingList1Quarter: '',
+      // 下面的数组数据是自定义时间范围的
+      meetingListInDateSpan: '',
       userList: [],
       meetingTypes: [],
       meetingLocations: [],
@@ -484,7 +521,9 @@ export default {
         location: [
           { required: true, message: 'location is necessary', trigger: 'blur' }
         ]
-      }
+      },
+      // 这是自定义时间段数据分析的开始和结束时间
+      dateRangeForAnalysis: []
     }
   },
   created () {
@@ -582,6 +621,7 @@ export default {
       })
     },
     addDialogClose () {
+      this.addForm.remark = ''
       this.$refs.addFormRef.resetFields()
     },
     showAddMeetingTypeDialog () {
@@ -925,6 +965,25 @@ export default {
         }]
       }
       myBarChart.setOption(option)
+    },
+    async getMeetingListInDateSpan () {
+      const result = await this.$http.post('/getMeetingListInDateSpan', {
+        startTime: this.dateRangeForAnalysis[0],
+        endTime: this.dateRangeForAnalysis[1]
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load order')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.meetingListInDateSpan = result.data.result
+      this.processMeetingUsersOrLocations(this.meetingListInDateSpan.users, 'customed-users',
+        'AA Attendence in Customed Time Range', 'SubText Title', 'AA')
+      this.processMeetingTypes(this.meetingListInDateSpan.types, 'customed-types',
+        'AA Meeting Types in Customed Time Range', 'SubText Title', 'Types')
+      this.processMeetingUsersOrLocations(this.meetingListInDateSpan.locations, 'customed-locations',
+        'AA Meeting Locations in Customed Time Range', 'SubText Title', 'Locations')
     }
   }
 }
@@ -1003,5 +1062,9 @@ export default {
 }
 .type-table {
   width: 500px;
+}
+.search-for-analysis-bar {
+  margin-top: 10px;
+  margin-bottom: 25px;
 }
 </style>
