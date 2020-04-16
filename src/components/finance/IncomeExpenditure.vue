@@ -14,7 +14,7 @@
           format="yyyy - MM - dd" value-format="yyyy-MM-dd"
           style="margin-left: 15px;">
           </el-date-picker>
-          <el-button type="primary" @click="getIncomeExpenseList" plain
+          <el-button type="primary" @click="searchIncomExpense" plain
           icon="el-icon-search" style="margin-left: 15px;">search</el-button>
         </div>
         <div class="inlint-div">
@@ -23,112 +23,177 @@
           <el-button type="success" @click="exportIncomeExpenseExcel" plain icon="el-icon-download">Export Excel</el-button>
         </div>
       </div>
-      <el-table :data="inOutList" border stripe empty-text="no data">
-        <el-table-column type="expand">
-          <template slot-scope="scope">
-            <el-form label-position="left" label-width="130px" inline class="demo-table-expand">
-              <el-form-item label="Registrant">
-                <span>{{ scope.row.username }}</span>
-              </el-form-item>
-              <el-form-item label="Description">
-                <span>{{ scope.row.name }}</span>
-              </el-form-item>
-              <el-form-item label="Type">
-                <span v-if="scope.row.direction === 0">Income</span>
-                <span v-else>Expense</span>
-              </el-form-item>
-              <el-form-item label="Moeny($)">
-                <span>{{ scope.row.money }}</span>
-              </el-form-item>
-              <el-form-item label="Date">
-                <span>{{ scope.row.date }}</span>
-              </el-form-item>
-              <el-form-item label="Balance($)">
-                <span>{{ scope.row.balance }}</span>
-              </el-form-item>
-              <el-form-item label="Remark">
-                <span>{{ scope.row.remark }}</span>
-              </el-form-item>
-              <el-form-item label="Create time">
-                <span>{{ scope.row.createTime }}</span>
-              </el-form-item>
-              <el-form-item label="Update time">
-                <span>{{ scope.row.updateTime }}</span>
-              </el-form-item>
-            </el-form>
-          </template>
-        </el-table-column>
-        <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-        <el-table-column label="About" prop="name" align="center"></el-table-column>
-        <el-table-column label="Money($)" prop="money" width="90px" align="center"></el-table-column>
-        <el-table-column label="Direction" prop="direction" width="100px" align="center">
-          <template slot-scope="scope">
-            <el-tag type="success" v-if="scope.row.direction === 0">Income</el-tag>
-            <el-tag type="warning" v-else>Expense</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Registrant" prop="username" align="center" width="100"></el-table-column>
-        <el-table-column label="Date" prop="date" align="center" width="120"></el-table-column>
-        <el-table-column label="Balance($)" prop="balance" width="100px" align="center"></el-table-column>
-        <el-table-column label="Operation" align="center" width="150">
-          <template slot-scope="scope">
-            <el-tooltip effect="dark" content="edit Income/Expense; If you want to modify money, delete this record and add a new one" placement="top">
-              <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
-            </el-tooltip>
-            <el-tooltip effect="dark" content="delete Income/Expense" placement="top">
-              <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row)" icon="el-icon-delete"></el-button>
-            </el-tooltip>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="queryInfo.pageNum"
-        :page-sizes="[10]"
-        :page-size="queryInfo.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total">
-      </el-pagination>
-      <p>
-        <span class="display-title">Data Statistics</span>
-      </p>
-      <el-tabs @tab-click="handleClick">
-        <el-tab-pane label="Last Week" name="first">
-          <div>
-            <div id="left-7days" class="left-data"></div>
-            <div id="right-7days" class="right-data"></div>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="Last Month" name="second">
-          <div>
-            <div id="left-1month" class="left-data"></div>
-            <div id="right-1month" class="right-data"></div>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="Customed Time Span" name="third">
-          <div>
-             <div class="search-for-analysis-bar">
-              <el-date-picker v-model="dateRangeForAnalysis" type="daterange" range-separator="to"
-              start-placeholder="Start Date" end-placeholder="End Date"
-              format="yyyy - MM - dd" value-format="yyyy-MM-dd"
-              style="margin-left: 15px;"></el-date-picker>
-              <el-button type="primary" @click="getInOutListForAnalysis" plain
-              icon="el-icon-search" style="margin-left: 15px;">search</el-button>
-            </div>
-            <div>
-              <div id="left-custom" class="left-data"></div>
-              <div id="right-custom" class="right-data"></div>
-            </div>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="All Time" name="fourth">
-          <div>
-            <div id="left-all" class="left-data"></div>
-            <div id="right-all" class="right-data"></div>
-          </div>
-        </el-tab-pane>
-      </el-tabs>
+      <transition mode="out-in" name="fade">
+        <div v-if="searchVisible" key="search">
+          <i class="el-icon-back" @click="backTo"></i>
+          <el-table :data="inOutListWithCondition" border stripe empty-text="no data">
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-form label-position="left" label-width="130px" inline class="demo-table-expand">
+                  <el-form-item label="Registrant">
+                    <span>{{ scope.row.username }}</span>
+                  </el-form-item>
+                  <el-form-item label="Description">
+                    <span>{{ scope.row.name }}</span>
+                  </el-form-item>
+                  <el-form-item label="Type">
+                    <span v-if="scope.row.direction === 0">Income</span>
+                    <span v-else>Expense</span>
+                  </el-form-item>
+                  <el-form-item label="Moeny($)">
+                    <span>{{ scope.row.money }}</span>
+                  </el-form-item>
+                  <el-form-item label="Date">
+                    <span>{{ scope.row.date }}</span>
+                  </el-form-item>
+                  <el-form-item label="Balance($)">
+                    <span>{{ scope.row.balance }}</span>
+                  </el-form-item>
+                  <el-form-item label="Remark">
+                    <span>{{ scope.row.remark }}</span>
+                  </el-form-item>
+                  <el-form-item label="Create time">
+                    <span>{{ scope.row.createTime }}</span>
+                  </el-form-item>
+                  <el-form-item label="Update time">
+                    <span>{{ scope.row.updateTime }}</span>
+                  </el-form-item>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+            <el-table-column label="About" prop="name" align="center"></el-table-column>
+            <el-table-column label="Money($)" prop="money" width="90px" align="center"></el-table-column>
+            <el-table-column label="Direction" prop="direction" width="100px" align="center">
+              <template slot-scope="scope">
+                <el-tag type="success" v-if="scope.row.direction === 0">Income</el-tag>
+                <el-tag type="warning" v-else>Expense</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="Registrant" prop="username" align="center" width="100"></el-table-column>
+            <el-table-column label="Date" prop="date" align="center" width="120"></el-table-column>
+            <el-table-column label="Balance($)" prop="balance" width="100px" align="center"></el-table-column>
+            <el-table-column label="Operation" align="center" width="150">
+              <template slot-scope="scope">
+                <el-tooltip effect="dark" content="edit Income/Expense; If you want to modify money, delete this record and add a new one" placement="top">
+                  <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                </el-tooltip>
+                <el-tooltip effect="dark" content="delete Income/Expense" placement="top">
+                  <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row)" icon="el-icon-delete"></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div v-else key="normal">
+          <el-table :data="inOutList" border stripe empty-text="no data">
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-form label-position="left" label-width="130px" inline class="demo-table-expand">
+                  <el-form-item label="Registrant">
+                    <span>{{ scope.row.username }}</span>
+                  </el-form-item>
+                  <el-form-item label="Description">
+                    <span>{{ scope.row.name }}</span>
+                  </el-form-item>
+                  <el-form-item label="Type">
+                    <span v-if="scope.row.direction === 0">Income</span>
+                    <span v-else>Expense</span>
+                  </el-form-item>
+                  <el-form-item label="Moeny($)">
+                    <span>{{ scope.row.money }}</span>
+                  </el-form-item>
+                  <el-form-item label="Date">
+                    <span>{{ scope.row.date }}</span>
+                  </el-form-item>
+                  <el-form-item label="Balance($)">
+                    <span>{{ scope.row.balance }}</span>
+                  </el-form-item>
+                  <el-form-item label="Remark">
+                    <span>{{ scope.row.remark }}</span>
+                  </el-form-item>
+                  <el-form-item label="Create time">
+                    <span>{{ scope.row.createTime }}</span>
+                  </el-form-item>
+                  <el-form-item label="Update time">
+                    <span>{{ scope.row.updateTime }}</span>
+                  </el-form-item>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+            <el-table-column label="About" prop="name" align="center"></el-table-column>
+            <el-table-column label="Money($)" prop="money" width="90px" align="center"></el-table-column>
+            <el-table-column label="Direction" prop="direction" width="100px" align="center">
+              <template slot-scope="scope">
+                <el-tag type="success" v-if="scope.row.direction === 0">Income</el-tag>
+                <el-tag type="warning" v-else>Expense</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="Registrant" prop="username" align="center" width="100"></el-table-column>
+            <el-table-column label="Date" prop="date" align="center" width="120"></el-table-column>
+            <el-table-column label="Balance($)" prop="balance" width="100px" align="center"></el-table-column>
+            <el-table-column label="Operation" align="center" width="150">
+              <template slot-scope="scope">
+                <el-tooltip effect="dark" content="edit Income/Expense; If you want to modify money, delete this record and add a new one" placement="top">
+                  <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                </el-tooltip>
+                <el-tooltip effect="dark" content="delete Income/Expense" placement="top">
+                  <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row)" icon="el-icon-delete"></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="queryInfo.pageNum"
+            :page-sizes="[10]"
+            :page-size="queryInfo.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
+          <p>
+            <span class="display-title">Data Statistics</span>
+          </p>
+          <el-tabs @tab-click="handleClick">
+            <el-tab-pane label="Last Week" name="first">
+              <div>
+                <div id="left-7days" class="left-data"></div>
+                <div id="right-7days" class="right-data"></div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="Last Month" name="second">
+              <div>
+                <div id="left-1month" class="left-data"></div>
+                <div id="right-1month" class="right-data"></div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="Customed Time Span" name="third">
+              <div>
+                <div class="search-for-analysis-bar">
+                  <el-date-picker v-model="dateRangeForAnalysis" type="daterange" range-separator="to"
+                  start-placeholder="Start Date" end-placeholder="End Date"
+                  format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+                  style="margin-left: 15px;"></el-date-picker>
+                  <el-button type="primary" @click="getInOutListForAnalysis" plain
+                  icon="el-icon-search" style="margin-left: 15px;">search</el-button>
+                </div>
+                <div>
+                  <div id="left-custom" class="left-data"></div>
+                  <div id="right-custom" class="right-data"></div>
+                </div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="All Time" name="fourth">
+              <div>
+                <div id="left-all" class="left-data"></div>
+                <div id="right-all" class="right-data"></div>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </transition>
     </el-card>
     <!-- edit income/expense -->
     <el-dialog
@@ -230,6 +295,7 @@ export default {
   data () {
     return {
       inOutList: [],
+      inOutListWithCondition: [],
       inOutListAllDays: [],
       inOutList7Days: [],
       inOutList1Month: [],
@@ -296,7 +362,8 @@ export default {
         ]
       },
       dateRangeForAnalysis: [],
-      inOutListForAnalysis: []
+      inOutListForAnalysis: [],
+      searchVisible: false
     }
   },
   created () {
@@ -313,7 +380,7 @@ export default {
         endTime: this.queryInfo.endTime
       })
       if (result.status !== 200) {
-        return this.$message.error('failed to load order')
+        return this.$message.error('failed to load income and expense list')
       }
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
@@ -650,6 +717,25 @@ export default {
       this.inOutListForAnalysis = result.data.result
       this.processDataAnalysisLeft(this.inOutListForAnalysis, 'left-custom')
       this.processDataAnalysisRight(this.inOutListForAnalysis, 'right-custom')
+    },
+    async searchIncomExpense () {
+      console.log()
+      this.searchVisible = true
+      const result = await this.$http.post('/getIncomeExpenseListWithCondition', {
+        info: this.queryInfo.info,
+        startTime: this.queryInfo.startTime,
+        endTime: this.queryInfo.endTime
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load income and expense list')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.inOutListWithCondition = result.data.result
+    },
+    backTo () {
+      this.searchVisible = false
     }
   }
 }
@@ -718,5 +804,20 @@ export default {
 .search-for-analysis-bar {
   margin-top: 10px;
   margin-bottom: 25px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  //all:过渡的属性名称, 0.2s:过渡的时长,
+  // ease:速率,ease表示开始慢然后快最后慢
+  transition: all 0.1s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);   // 表示进入点的位置, X轴,正向100px处进入
+}
+.el-icon-back {
+  font-size: 25px;
+  margin-top: 15px;
 }
 </style>
