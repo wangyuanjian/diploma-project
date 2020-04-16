@@ -17,253 +17,315 @@
           icon="el-icon-circle-plus-outline" class="add-btn">Add Meeting</el-button>
         </div>
       </div>
-      <div>
-        <el-table border stripe :data="meetingList" empty-text="no data">
-          <el-table-column type="expand" width="55">
-            <template slot-scope="scope">
-              <el-form label-position="left" label-width="130px" inline class="demo-table-expand">
-                <el-form-item label="Theme">
-                  <span>{{ scope.row.theme }}</span>
-                </el-form-item>
-                <el-form-item label="Total">
-                  <span>{{ scope.row.total }}</span>
-                </el-form-item>
-                <el-form-item label="Type">
-                  <span>{{ scope.row.type }}</span>
-                </el-form-item>
-                <el-form-item label="Location">
-                  <span>{{ scope.row.location }}</span>
-                </el-form-item>
-                <el-form-item label="Begin Time">
-                  <span>{{ scope.row.beginTime }}</span>
-                </el-form-item>
-                <el-form-item label="End Time">
-                  <span>{{ scope.row.endTime }}</span>
-                </el-form-item>
-                <el-form-item label="Create Time">
-                  <span>{{ scope.row.createTime }}</span>
-                </el-form-item>
-                <el-form-item label="Update Time">
-                  <span>{{ scope.row.updateTime }}</span>
-                </el-form-item>
-                <el-form-item label="Remark">
-                  <span>{{ scope.row.remark }}</span>
-                </el-form-item>
-                <el-form-item label="Users">
-                  <span v-for="item in scope.row.users" :key="item.userId" class="button-border">{{ item.username }}</span>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-          <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-          <el-table-column label="Theme" prop="theme" align="center"></el-table-column>
-          <el-table-column label="Total" prop="total" width="60px" align="center"></el-table-column>
-          <el-table-column label="Begin Time" prop="beginTime" width="110px" align="center"></el-table-column>
-          <el-table-column label="End Time" prop="endTime" align="center" width="110px"></el-table-column>
-          <el-table-column label="Location" prop="location" align="center" width="100"></el-table-column>
-          <el-table-column label="Type" prop="type" align="center" width="130"></el-table-column>
-          <el-table-column label="Operaion" align="center" width="120">
-            <template slot-scope="scope" align="center">
-              <el-tooltip effect="dark" content="edit meeting" placement="top">
-                <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="delete meeting" placement="top">
-                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="queryInfo.pageNum"
-          :page-sizes="[10]"
-          :page-size="queryInfo.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
-        </el-pagination>
-      </div>
-      <div class="type-box">
-        <el-collapse v-model="collapseActiveName" accordion>
-          <el-collapse-item title="Meeting Types" name="types">
-            <div class="table-button-box">
-              <div class="inline-div">
-                <el-table border stripe :data="meetingTypes" empty-text="no data" class="type-table">
-                  <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-                  <el-table-column label="Type" prop="type" align="center"></el-table-column>
-                  <el-table-column label="Operaion" align="center" width="120">
-                    <template slot-scope="scope" align="center">
-                      <el-tooltip effect="dark" content="delete meeting type" placement="top">
-                        <el-button type="danger" size="small" plain @click="showDeleteTypeDialog(scope.row)" icon="el-icon-delete"></el-button>
-                      </el-tooltip>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-              <div class="inline-div">
-                <el-button type="success" @click="showAddMeetingTypeDialog" plain
-                icon="el-icon-circle-plus-outline" class="add-btn">Add Type</el-button>
-              </div>
-            </div>
-          </el-collapse-item>
-          <el-collapse-item title="Meeting Locations" name="locations">
-            <div class="table-button-box">
-              <div class="inline-div">
-                <el-table border stripe :data="meetingLocations" empty-text="no data" class="type-table">
-                  <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-                  <el-table-column label="Location" prop="location" align="center"></el-table-column>
-                  <el-table-column label="Operaion" align="center" width="120">
-                    <template slot-scope="scope" align="center">
-                      <el-tooltip effect="dark" content="delete meeting location" placement="top">
-                        <el-button type="danger" size="small" plain @click="showDeleteLocationDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
-                      </el-tooltip>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-              <div class="inline-div">
-                <el-button type="success" @click="showAddMeetingLocationDialog" plain
-                icon="el-icon-circle-plus-outline" class="add-btn">Add Location</el-button>
-              </div>
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-      </div>
-      <div class="data-box">
-        <p>
-          <span class="display-title">Data Statistics</span>
-        </p>
-        <el-tabs @tab-click="handleTabClick">
-          <el-tab-pane label="Last Week" name="first">
-            <div>
-              <div id="form-data" class="block-display">
-                <p>
-                  <span class="form-title">Meeting Number: </span>
-                  <span class="form-content">{{meetingList7Days.meetingNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total AA Number: </span>
-                  <span class="form-content">{{meetingList7Days.totalNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Number: </span>
-                  <span class="form-content">{{meetingList7Days.avgNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total Time: </span>
-                  <span class="form-content">{{meetingList7Days.totalTime}}(min)</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Time: </span>
-                  <span class="form-content">{{meetingList7Days.avgTime}}(min)</span>
-                </p>
-              </div>
-              <div id="last-week-users" class="echarts-div"></div>
-              <div id="last-week-locations" class="echarts-div"></div>
-              <div id="last-week-types" class="echarts-div"></div>
-              <div id="last-week-meetings" class="echarts-div"></div>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="Last Month" name="second">
-            <div>
-              <div id="form-data" class="block-display">
-                <p>
-                  <span class="form-title">Meeting Number: </span>
-                  <span class="form-content">{{meetingList1Month.meetingNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total AA Number: </span>
-                  <span class="form-content">{{meetingList1Month.totalNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Number: </span>
-                  <span class="form-content">{{meetingList1Month.avgNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total Time: </span>
-                  <span class="form-content">{{meetingList1Month.totalTime}}(min)</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Time: </span>
-                  <span class="form-content">{{meetingList1Month.avgTime}}(min)</span>
-                </p>
-              </div>
-              <div id="last-month-users" class="echarts-div"></div>
-              <div id="last-month-locations" class="echarts-div"></div>
-              <div id="last-month-types" class="echarts-div"></div>
-              <div id="last-month-meetings" class="echarts-div"></div>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="Last Quarter" name="third">
-            <div>
-              <div id="form-data" class="block-display">
-                <p>
-                  <span class="form-title">Meeting Number: </span>
-                  <span class="form-content">{{meetingList1Quarter.meetingNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total AA Number: </span>
-                  <span class="form-content">{{meetingList1Quarter.totalNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Number: </span>
-                  <span class="form-content">{{meetingList1Quarter.avgNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total Time: </span>
-                  <span class="form-content">{{meetingList1Quarter.totalTime}}(min)</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Time: </span>
-                  <span class="form-content">{{meetingList1Quarter.avgTime}}(min)</span>
-                </p>
-              </div>
-              <div id="last-quarter-users" class="echarts-div"></div>
-              <div id="last-quarter-locations" class="echarts-div"></div>
-              <div id="last-quarter-types" class="echarts-div"></div>
-              <div id="last-quarter-meetings" class="echarts-div"></div>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="Customed Time Span" name="fourth">
-            <div>
-             <div class="search-for-analysis-bar">
-                <el-date-picker v-model="dateRangeForAnalysis" type="daterange" range-separator="to"
-                start-placeholder="Start Date" end-placeholder="End Date"
-                format="yyyy - MM - dd" value-format="yyyy-MM-dd"
-                style="margin-left: 15px;"></el-date-picker>
-                <el-button type="primary" @click="getMeetingListInDateSpan" plain
-                icon="el-icon-search" style="margin-left: 15px;">search</el-button>
-              </div>
-              <div id="form-data" class="block-display">
-                <p>
-                  <span class="form-title">Meeting Number: </span>
-                  <span class="form-content">{{meetingListInDateSpan.meetingNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total AA Number: </span>
-                  <span class="form-content">{{meetingListInDateSpan.totalNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Number: </span>
-                  <span class="form-content">{{meetingListInDateSpan.avgNumber}}</span>
-                </p>
-                <p>
-                  <span class="form-title">Total Time: </span>
-                  <span class="form-content">{{meetingListInDateSpan.totalTime}}(min)</span>
-                </p>
-                <p>
-                  <span class="form-title">Average Time: </span>
-                  <span class="form-content">{{meetingListInDateSpan.avgTime}}(min)</span>
-                </p>
-              </div>
-              <div id="customed-users" class="echarts-div"></div>
-              <div id="customed-locations" class="echarts-div"></div>
-              <div id="customed-types" class="echarts-div"></div>
-              <div id="cusotmed-meetings" class="echarts-div"></div>
-            </div>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
+      <transition mode="out-in" name="fade">
+        <div v-if="searchVisible" key="search">
+          <i class="el-icon-back" @click="backTo"></i>
+          <el-table border stripe :data="meetingListWithCondition" empty-text="no data">
+            <el-table-column type="expand" width="55">
+              <template slot-scope="scope">
+                <el-form label-position="left" label-width="130px" inline class="demo-table-expand">
+                  <el-form-item label="Theme">
+                    <span>{{ scope.row.theme }}</span>
+                  </el-form-item>
+                  <el-form-item label="Total">
+                    <span>{{ scope.row.total }}</span>
+                  </el-form-item>
+                  <el-form-item label="Type">
+                    <span>{{ scope.row.type }}</span>
+                  </el-form-item>
+                  <el-form-item label="Location">
+                    <span>{{ scope.row.location }}</span>
+                  </el-form-item>
+                  <el-form-item label="Begin Time">
+                    <span>{{ scope.row.beginTime }}</span>
+                  </el-form-item>
+                  <el-form-item label="End Time">
+                    <span>{{ scope.row.endTime }}</span>
+                  </el-form-item>
+                  <el-form-item label="Create Time">
+                    <span>{{ scope.row.createTime }}</span>
+                  </el-form-item>
+                  <el-form-item label="Update Time">
+                    <span>{{ scope.row.updateTime }}</span>
+                  </el-form-item>
+                  <el-form-item label="Remark">
+                    <span>{{ scope.row.remark }}</span>
+                  </el-form-item>
+                  <el-form-item label="Users">
+                    <span v-for="item in scope.row.users" :key="item.userId" class="button-border">{{ item.username }}</span>
+                  </el-form-item>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+            <el-table-column label="Theme" prop="theme" align="center"></el-table-column>
+            <el-table-column label="Total" prop="total" width="60px" align="center"></el-table-column>
+            <el-table-column label="Begin Time" prop="beginTime" width="110px" align="center"></el-table-column>
+            <el-table-column label="End Time" prop="endTime" align="center" width="110px"></el-table-column>
+            <el-table-column label="Location" prop="location" align="center" width="100"></el-table-column>
+            <el-table-column label="Type" prop="type" align="center" width="130"></el-table-column>
+            <el-table-column label="Operaion" align="center" width="120">
+              <template slot-scope="scope" align="center">
+                <el-tooltip effect="dark" content="edit meeting" placement="top">
+                  <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                </el-tooltip>
+                <el-tooltip effect="dark" content="delete meeting" placement="top">
+                  <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div v-else key="normal">
+          <div>
+            <el-table border stripe :data="meetingList" empty-text="no data">
+              <el-table-column type="expand" width="55">
+                <template slot-scope="scope">
+                  <el-form label-position="left" label-width="130px" inline class="demo-table-expand">
+                    <el-form-item label="Theme">
+                      <span>{{ scope.row.theme }}</span>
+                    </el-form-item>
+                    <el-form-item label="Total">
+                      <span>{{ scope.row.total }}</span>
+                    </el-form-item>
+                    <el-form-item label="Type">
+                      <span>{{ scope.row.type }}</span>
+                    </el-form-item>
+                    <el-form-item label="Location">
+                      <span>{{ scope.row.location }}</span>
+                    </el-form-item>
+                    <el-form-item label="Begin Time">
+                      <span>{{ scope.row.beginTime }}</span>
+                    </el-form-item>
+                    <el-form-item label="End Time">
+                      <span>{{ scope.row.endTime }}</span>
+                    </el-form-item>
+                    <el-form-item label="Create Time">
+                      <span>{{ scope.row.createTime }}</span>
+                    </el-form-item>
+                    <el-form-item label="Update Time">
+                      <span>{{ scope.row.updateTime }}</span>
+                    </el-form-item>
+                    <el-form-item label="Remark">
+                      <span>{{ scope.row.remark }}</span>
+                    </el-form-item>
+                    <el-form-item label="Users">
+                      <span v-for="item in scope.row.users" :key="item.userId" class="button-border">{{ item.username }}</span>
+                    </el-form-item>
+                  </el-form>
+                </template>
+              </el-table-column>
+              <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+              <el-table-column label="Theme" prop="theme" align="center"></el-table-column>
+              <el-table-column label="Total" prop="total" width="60px" align="center"></el-table-column>
+              <el-table-column label="Begin Time" prop="beginTime" width="110px" align="center"></el-table-column>
+              <el-table-column label="End Time" prop="endTime" align="center" width="110px"></el-table-column>
+              <el-table-column label="Location" prop="location" align="center" width="100"></el-table-column>
+              <el-table-column label="Type" prop="type" align="center" width="130"></el-table-column>
+              <el-table-column label="Operaion" align="center" width="120">
+                <template slot-scope="scope" align="center">
+                  <el-tooltip effect="dark" content="edit meeting" placement="top">
+                    <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" content="delete meeting" placement="top">
+                    <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="queryInfo.pageNum"
+              :page-sizes="[10]"
+              :page-size="queryInfo.pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
+          </div>
+          <div class="type-box">
+            <el-collapse v-model="collapseActiveName" accordion>
+              <el-collapse-item title="Meeting Types" name="types">
+                <div class="table-button-box">
+                  <div class="inline-div">
+                    <el-table border stripe :data="meetingTypes" empty-text="no data" class="type-table">
+                      <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+                      <el-table-column label="Type" prop="type" align="center"></el-table-column>
+                      <el-table-column label="Operaion" align="center" width="120">
+                        <template slot-scope="scope" align="center">
+                          <el-tooltip effect="dark" content="delete meeting type" placement="top">
+                            <el-button type="danger" size="small" plain @click="showDeleteTypeDialog(scope.row)" icon="el-icon-delete"></el-button>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </div>
+                  <div class="inline-div">
+                    <el-button type="success" @click="showAddMeetingTypeDialog" plain
+                    icon="el-icon-circle-plus-outline" class="add-btn">Add Type</el-button>
+                  </div>
+                </div>
+              </el-collapse-item>
+              <el-collapse-item title="Meeting Locations" name="locations">
+                <div class="table-button-box">
+                  <div class="inline-div">
+                    <el-table border stripe :data="meetingLocations" empty-text="no data" class="type-table">
+                      <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+                      <el-table-column label="Location" prop="location" align="center"></el-table-column>
+                      <el-table-column label="Operaion" align="center" width="120">
+                        <template slot-scope="scope" align="center">
+                          <el-tooltip effect="dark" content="delete meeting location" placement="top">
+                            <el-button type="danger" size="small" plain @click="showDeleteLocationDialog(scope.row, scope.$index, 0)" icon="el-icon-delete"></el-button>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </div>
+                  <div class="inline-div">
+                    <el-button type="success" @click="showAddMeetingLocationDialog" plain
+                    icon="el-icon-circle-plus-outline" class="add-btn">Add Location</el-button>
+                  </div>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+          <div class="data-box">
+            <p>
+              <span class="display-title">Data Statistics</span>
+            </p>
+            <el-tabs @tab-click="handleTabClick">
+              <el-tab-pane label="Last Week" name="first">
+                <div>
+                  <div id="form-data" class="block-display">
+                    <p>
+                      <span class="form-title">Meeting Number: </span>
+                      <span class="form-content">{{meetingList7Days.meetingNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total AA Number: </span>
+                      <span class="form-content">{{meetingList7Days.totalNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Number: </span>
+                      <span class="form-content">{{meetingList7Days.avgNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total Time: </span>
+                      <span class="form-content">{{meetingList7Days.totalTime}}(min)</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Time: </span>
+                      <span class="form-content">{{meetingList7Days.avgTime}}(min)</span>
+                    </p>
+                  </div>
+                  <div id="last-week-users" class="echarts-div"></div>
+                  <div id="last-week-locations" class="echarts-div"></div>
+                  <div id="last-week-types" class="echarts-div"></div>
+                  <div id="last-week-meetings" class="echarts-div"></div>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="Last Month" name="second">
+                <div>
+                  <div id="form-data" class="block-display">
+                    <p>
+                      <span class="form-title">Meeting Number: </span>
+                      <span class="form-content">{{meetingList1Month.meetingNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total AA Number: </span>
+                      <span class="form-content">{{meetingList1Month.totalNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Number: </span>
+                      <span class="form-content">{{meetingList1Month.avgNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total Time: </span>
+                      <span class="form-content">{{meetingList1Month.totalTime}}(min)</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Time: </span>
+                      <span class="form-content">{{meetingList1Month.avgTime}}(min)</span>
+                    </p>
+                  </div>
+                  <div id="last-month-users" class="echarts-div"></div>
+                  <div id="last-month-locations" class="echarts-div"></div>
+                  <div id="last-month-types" class="echarts-div"></div>
+                  <div id="last-month-meetings" class="echarts-div"></div>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="Last Quarter" name="third">
+                <div>
+                  <div id="form-data" class="block-display">
+                    <p>
+                      <span class="form-title">Meeting Number: </span>
+                      <span class="form-content">{{meetingList1Quarter.meetingNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total AA Number: </span>
+                      <span class="form-content">{{meetingList1Quarter.totalNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Number: </span>
+                      <span class="form-content">{{meetingList1Quarter.avgNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total Time: </span>
+                      <span class="form-content">{{meetingList1Quarter.totalTime}}(min)</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Time: </span>
+                      <span class="form-content">{{meetingList1Quarter.avgTime}}(min)</span>
+                    </p>
+                  </div>
+                  <div id="last-quarter-users" class="echarts-div"></div>
+                  <div id="last-quarter-locations" class="echarts-div"></div>
+                  <div id="last-quarter-types" class="echarts-div"></div>
+                  <div id="last-quarter-meetings" class="echarts-div"></div>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="Customed Time Span" name="fourth">
+                <div>
+                <div class="search-for-analysis-bar">
+                    <el-date-picker v-model="dateRangeForAnalysis" type="daterange" range-separator="to"
+                    start-placeholder="Start Date" end-placeholder="End Date"
+                    format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+                    style="margin-left: 15px;"></el-date-picker>
+                    <el-button type="primary" @click="getMeetingListInDateSpan" plain
+                    icon="el-icon-search" style="margin-left: 15px;">search</el-button>
+                  </div>
+                  <div id="form-data" class="block-display">
+                    <p>
+                      <span class="form-title">Meeting Number: </span>
+                      <span class="form-content">{{meetingListInDateSpan.meetingNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total AA Number: </span>
+                      <span class="form-content">{{meetingListInDateSpan.totalNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Number: </span>
+                      <span class="form-content">{{meetingListInDateSpan.avgNumber}}</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Total Time: </span>
+                      <span class="form-content">{{meetingListInDateSpan.totalTime}}(min)</span>
+                    </p>
+                    <p>
+                      <span class="form-title">Average Time: </span>
+                      <span class="form-content">{{meetingListInDateSpan.avgTime}}(min)</span>
+                    </p>
+                  </div>
+                  <div id="customed-users" class="echarts-div"></div>
+                  <div id="customed-locations" class="echarts-div"></div>
+                  <div id="customed-types" class="echarts-div"></div>
+                  <div id="cusotmed-meetings" class="echarts-div"></div>
+                </div>
+              </el-tab-pane>
+            </el-tabs>
+          </div>
+        </div>
+      </transition>
     </el-card>
     <!-- Add Meeting -->
     <el-dialog
@@ -450,6 +512,7 @@ export default {
   data () {
     return {
       meetingList: [],
+      meetingListWithCondition: [],
       meetingList7Days: '',
       meetingList1Month: '',
       meetingList1Quarter: '',
@@ -547,7 +610,8 @@ export default {
         ]
       },
       // 这是自定义时间段数据分析的开始和结束时间
-      dateRangeForAnalysis: []
+      dateRangeForAnalysis: [],
+      searchVisible: false
     }
   },
   created () {
@@ -824,7 +888,22 @@ export default {
         })
       })
     },
-    searchMeetings () {},
+    async searchMeetings () {
+      this.searchVisible = true
+      const result = await this.$http.post('/getMeetingListWithCondition', {
+        info: this.queryInfo.info
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load meetings')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.meetingListWithCondition = result.data.result
+    },
+    backTo () {
+      this.searchVisible = false
+    },
     selectedUserChangedforEdit (changedUser) {
       this.editForm.total = changedUser.length
     },
@@ -1199,5 +1278,20 @@ export default {
 .search-for-analysis-bar {
   margin-top: 10px;
   margin-bottom: 25px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  //all:过渡的属性名称, 0.2s:过渡的时长,
+  // ease:速率,ease表示开始慢然后快最后慢
+  transition: all 0.1s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);   // 表示进入点的位置, X轴,正向100px处进入
+}
+.el-icon-back {
+  font-size: 25px;
+  margin-top: 15px;
 }
 </style>
