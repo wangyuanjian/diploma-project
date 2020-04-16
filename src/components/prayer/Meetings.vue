@@ -161,14 +161,12 @@
               <div id="last-week-users" class="echarts-div"></div>
               <div id="last-week-locations" class="echarts-div"></div>
               <div id="last-week-types" class="echarts-div"></div>
-              <div id="last-week" class="echarts-div">
-                <pre>{{meetingList7Days}}</pre>
-              </div>
+              <div id="last-week-meetings" class="echarts-div"></div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="Last Month" name="second">
             <div>
-              <div id="form-data" class="block-display temp-border">
+              <div id="form-data" class="block-display">
                 <p>
                   <span class="form-title">Meeting Number: </span>
                   <span class="form-content">{{meetingList1Month.meetingNumber}}</span>
@@ -190,12 +188,40 @@
                   <span class="form-content">{{meetingList1Month.avgTime}}(min)</span>
                 </p>
               </div>
-              <div id="last-month" class="echarts-div"></div>
+              <div id="last-month-users" class="echarts-div"></div>
+              <div id="last-month-locations" class="echarts-div"></div>
+              <div id="last-month-types" class="echarts-div"></div>
+              <div id="last-month-meetings" class="echarts-div"></div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="Last Quarter" name="third">
             <div>
-              <div id="last-quarter" class="echarts-div"></div>
+              <div id="form-data" class="block-display">
+                <p>
+                  <span class="form-title">Meeting Number: </span>
+                  <span class="form-content">{{meetingList1Quarter.meetingNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total AA Number: </span>
+                  <span class="form-content">{{meetingList1Quarter.totalNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Number: </span>
+                  <span class="form-content">{{meetingList1Quarter.avgNumber}}</span>
+                </p>
+                <p>
+                  <span class="form-title">Total Time: </span>
+                  <span class="form-content">{{meetingList1Quarter.totalTime}}(min)</span>
+                </p>
+                <p>
+                  <span class="form-title">Average Time: </span>
+                  <span class="form-content">{{meetingList1Quarter.avgTime}}(min)</span>
+                </p>
+              </div>
+              <div id="last-quarter-users" class="echarts-div"></div>
+              <div id="last-quarter-locations" class="echarts-div"></div>
+              <div id="last-quarter-types" class="echarts-div"></div>
+              <div id="last-quarter-meetings" class="echarts-div"></div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="Customed Time Span" name="fourth">
@@ -233,9 +259,7 @@
               <div id="customed-users" class="echarts-div"></div>
               <div id="customed-locations" class="echarts-div"></div>
               <div id="customed-types" class="echarts-div"></div>
-              <div id="last-week" class="echarts-div">
-                <pre>{{meetingListInDateSpan}}</pre>
-              </div>
+              <div id="cusotmed-meetings" class="echarts-div"></div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -836,10 +860,28 @@ export default {
             'AA Meeting Types in Last Week', 'SubText Title', 'Types')
           this.processMeetingUsersOrLocations(this.meetingList7Days.locations, 'last-week-locations',
             'AA Meeting Locations in Last Week', 'SubText Title', 'Locations')
+          this.processMeeting(this.meetingList7Days.meetings, 'last-week-meetings',
+            'AA Meetings in Last Week')
         } else if (nDays === 30) {
           this.meetingList1Month = result.data.result
-        } else if (nDays === -1) {
+          this.processMeetingUsersOrLocations(this.meetingList1Month.users, 'last-month-users',
+            'AA Attendence in Last Month', 'SubText Title', 'AA')
+          this.processMeetingTypes(this.meetingList1Month.types, 'last-month-types',
+            'AA Meeting Types in Last Month', 'SubText Title', 'Types')
+          this.processMeetingUsersOrLocations(this.meetingList1Month.locations, 'last-month-locations',
+            'AA Meeting Locations in Last Month', 'SubText Title', 'Locations')
+          this.processMeeting(this.meetingList1Month.meetings, 'last-month-meetings',
+            'AA Meetings in Last Month')
+        } else if (nDays === 90) {
           this.meetingList1Quarter = result.data.result
+          this.processMeetingUsersOrLocations(this.meetingList1Quarter.users, 'last-quarter-users',
+            'AA Attendence in Last Quarter', 'SubText Title', 'AA')
+          this.processMeetingTypes(this.meetingList1Quarter.types, 'last-quarter-types',
+            'AA Meeting Types in Last Quarter', 'SubText Title', 'Types')
+          this.processMeetingUsersOrLocations(this.meetingList1Quarter.locations, 'last-quarter-locations',
+            'AA Meeting Locations in Last Quarter', 'SubText Title', 'Locations')
+          this.processMeeting(this.meetingList1Quarter.meetings, 'last-quarter-meetings',
+            'AA Meetings in Last Quarter')
         }
         this.$message.success('query meeting list successfully')
       }
@@ -856,6 +898,12 @@ export default {
       }
       var myBarChart = echarts.init(document.getElementById(divName))
       var option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'// 默认为直线，可选为：'line' | 'shadow'
+          }
+        },
         title: {
           text: title,
           subText: subText,
@@ -888,7 +936,7 @@ export default {
           data: xs,
           axisLabel: {
             interval: 0,
-            rotate: 45
+            rotate: 30
           }
         },
         yAxis: {
@@ -913,6 +961,12 @@ export default {
       }
       var myBarChart = echarts.init(document.getElementById(divName))
       var option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'// 默认为直线，可选为：'line' | 'shadow'
+          }
+        },
         title: {
           text: title,
           subText: subText,
@@ -939,7 +993,7 @@ export default {
           data: xs,
           axisLabel: {
             interval: 0,
-            rotate: 45
+            rotate: 30
           },
           axisTick: {
             length: 1
@@ -966,6 +1020,83 @@ export default {
       }
       myBarChart.setOption(option)
     },
+    processMeeting (list, divName, title) {
+      var myBarChart = echarts.init(document.getElementById(divName))
+      // 聚会时长
+      var time = []
+      var timeSpan = []
+      var number = []
+      for (var i = 0; i < list.length; i++) {
+        time.push(list[i].beginTime.substr(0, 10))
+        timeSpan.push(list[i].timeSpan)
+        number.push(list[i].total)
+      }
+      var option = {
+        title: {
+          text: title,
+          left: 'center',
+          textStyle: {
+            fontSize: 20
+          }
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'// 默认为直线，可选为：'line' | 'shadow'
+          }
+        },
+        legend: {
+          data: ['time span', 'number'],
+          right: 10,
+          top: 10,
+          orient: 'vertical'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: time,
+          axisLabel: {
+            rotate: 30
+          }
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          name: 'time span',
+          type: 'bar',
+          data: timeSpan,
+          stack: '总量',
+          label: {
+            show: true,
+            position: 'insideRight'
+          }
+        }, {
+          name: 'number',
+          type: 'bar',
+          data: number,
+          stack: '总量',
+          label: {
+            show: true,
+            position: 'insideRight'
+          }
+        }],
+        dataZoom: [{
+          type: 'slider',
+          show: true,
+          start: 0,
+          end: 30,
+          xAxisIndex: [0],
+          bottom: -10
+        }]
+      }
+      myBarChart.setOption(option)
+    },
     async getMeetingListInDateSpan () {
       const result = await this.$http.post('/getMeetingListInDateSpan', {
         startTime: this.dateRangeForAnalysis[0],
@@ -984,6 +1115,8 @@ export default {
         'AA Meeting Types in Customed Time Range', 'SubText Title', 'Types')
       this.processMeetingUsersOrLocations(this.meetingListInDateSpan.locations, 'customed-locations',
         'AA Meeting Locations in Customed Time Range', 'SubText Title', 'Locations')
+      this.processMeeting(this.meetingListInDateSpan.meetings, 'cusotmed-meetings',
+        'AA Meetings in Customed Time Range')
     }
   }
 }
