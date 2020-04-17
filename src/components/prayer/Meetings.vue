@@ -8,7 +8,12 @@
     <el-card>
       <div class="header-box">
         <div class="inline-div">
-          <el-input placeholder="Input name for query" v-model="queryInfo.info" clearable style="width: 50%"></el-input>
+          <el-input placeholder="Input name for query" v-model="queryInfo.info" clearable style="width: 30%"></el-input>
+          <el-date-picker v-model="dateRange" type="daterange" range-separator="to"
+          start-placeholder="Start Date" end-placeholder="End Date"
+          format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+          style="margin-left: 15px;">
+          </el-date-picker>
           <el-button type="primary" @click="searchMeetings" plain
           icon="el-icon-search" style="margin-left: 15px;">search</el-button>
         </div>
@@ -611,7 +616,9 @@ export default {
       },
       // 这是自定义时间段数据分析的开始和结束时间
       dateRangeForAnalysis: [],
-      searchVisible: false
+      searchVisible: false,
+      // 这个是上面搜索的开始和结束时间
+      dateRange: []
     }
   },
   created () {
@@ -891,7 +898,9 @@ export default {
     async searchMeetings () {
       this.searchVisible = true
       const result = await this.$http.post('/getMeetingListWithCondition', {
-        info: this.queryInfo.info
+        info: this.queryInfo.info,
+        startTime: this.dateRange[0],
+        endTime: this.dateRange[1]
       })
       if (result.status !== 200) {
         return this.$message.error('failed to load meetings')
@@ -899,6 +908,8 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
+      this.queryInfo.info = ''
+      this.dateRange = []
       this.meetingListWithCondition = result.data.result
     },
     backTo () {

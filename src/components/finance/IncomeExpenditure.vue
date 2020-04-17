@@ -308,7 +308,6 @@ export default {
         endTime: ''
       },
       total: 1,
-      dateRange: [],
       addDialogVisible: false,
       directionList: [{
         label: 'income',
@@ -361,6 +360,9 @@ export default {
           { required: true, message: 'date is necessary', trigger: 'blur' }
         ]
       },
+      // 这个是全局搜索的开始和结束时间
+      dateRange: [],
+      // 这个是指定时间范围的数据分析的开始和结束时间
       dateRangeForAnalysis: [],
       inOutListForAnalysis: [],
       searchVisible: false
