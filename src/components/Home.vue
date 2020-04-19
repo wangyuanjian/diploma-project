@@ -3,7 +3,7 @@
     <el-header>
       <div>
         <!-- <img src="" alt=""> -->
-        <span class="title-text">Alcoholics Anonymous</span>
+        <span class="title-text" @click="toWelcome">Alcoholics Anonymous</span>
       </div>
       <el-button type="info" size="medium" @click="logout">log out</el-button>
     </el-header>
@@ -77,6 +77,9 @@ export default {
     saveNavState (activePath) {
       window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
+    },
+    toWelcome () {
+      this.$router.push('/home')
     }
   }
 }
@@ -99,6 +102,7 @@ export default {
   margin: 40px auto;
   text-align: center;
   font-weight: 500;
+  cursor: pointer;
 }
 .el-aside{
   background-color: #3f72af;
