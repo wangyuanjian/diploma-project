@@ -20,7 +20,7 @@
         </el-form-item>
         <!-- 按钮区 -->
         <el-form-item class="form-btns">
-          <el-button type="primary" size="medium" @click="login">Login</el-button>
+          <el-button type="primary" size="medium" @click="login">SIGN IN</el-button>
           <el-button type="info" size="medium" @click="resetLoginForm">Reset</el-button>
         </el-form-item>
       </el-form>
