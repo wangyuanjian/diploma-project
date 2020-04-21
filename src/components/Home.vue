@@ -5,7 +5,18 @@
         <!-- <img src="" alt=""> -->
         <span class="title-text" @click="toWelcome">Alcoholics Anonymous</span>
       </div>
-      <el-button type="info" size="medium" @click="logout">log out</el-button>
+      <div>
+        <el-dropdown @command="handleDropdownCommand">
+          <span class="el-dropdown-link">
+            <i class="iconfont icon-user"></i>
+            <i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="message">Messages</el-dropdown-item>
+            <el-dropdown-item divided command="logout">Log out</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
     </el-header>
     <el-container>
       <el-aside width="200px">
@@ -80,6 +91,13 @@ export default {
     },
     toWelcome () {
       this.$router.push('/home')
+    },
+    handleDropdownCommand (command) {
+      if (command === 'message') {
+        console.log('hello')
+      } else if (command === 'logout') {
+        this.logout()
+      }
     }
   }
 }
@@ -117,5 +135,11 @@ export default {
 .menu-name {
   font-size: 18px;
   font-weight: bold;
+}
+.icon-user {
+  font-size: 25px;
+}
+.el-icon-arrow-down {
+  font-size: 20px;
 }
 </style>

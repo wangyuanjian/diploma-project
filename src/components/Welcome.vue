@@ -7,7 +7,7 @@
       页面1/2/3 : is-in-stage
       页面1/4 : is-animating
       所以要给1/3设置一样的样式，给2设置一样的样式，需要注意这些类样式的书写先后顺序 -->
-      <el-carousel height="350px" arrow="always" type="card">
+      <el-carousel height="320px" arrow="always" type="card">
         <el-carousel-item>
           <img src="../assets/prayer.jpg" alt="" class="carouse-img">
         </el-carousel-item>
@@ -168,6 +168,7 @@ This is a better way to live.`
 <style lang="less" scoped>
 .carousel-box {
   margin: 0 auto;
+  width: 90%;
 }
 /deep/ .el-carousel__item{
   font-size: 14px;
@@ -191,7 +192,7 @@ This is a better way to live.`
   line-height: 1.5em;
   font-size: 17px;
   padding: 35px 20px 1px 20px;
-  font-family: "Fira Code";
+  font-family: "Roboto";
 }
 .carouse-img {
   width: 100%;
