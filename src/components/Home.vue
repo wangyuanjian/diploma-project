@@ -12,7 +12,7 @@
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="message">Messages</el-dropdown-item>
+            <el-dropdown-item command="message">Notes</el-dropdown-item>
             <el-dropdown-item divided command="logout">Log out</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -94,7 +94,7 @@ export default {
     },
     handleDropdownCommand (command) {
       if (command === 'message') {
-        console.log('hello')
+        this.$router.push('/notes')
       } else if (command === 'logout') {
         this.logout()
       }
@@ -113,6 +113,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 15px;
 }
 .title-text{
   font-family: 'Times New Roman', Times, serif;
@@ -123,14 +124,16 @@ export default {
   cursor: pointer;
 }
 .el-aside{
-  background-color: #3f72af;
+  background-color: #5c94bd;
   .el-menu{
     border-right: none;
   }
   width: 230px !important;
+  border-radius: 15px;
 }
 .el-main{
   background-color: #f9f7f7;
+  border-radius: 15px;
 }
 .menu-name {
   font-size: 18px;

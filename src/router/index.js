@@ -14,6 +14,7 @@ import Data from '../components/data/Data.vue'
 import IncomeExpenditure from '../components/finance/IncomeExpenditure.vue'
 import Prayers from '../components/prayer/Prayers.vue'
 import Meetings from '../components/prayer/Meetings.vue'
+import Note from '../components/Note.vue'
 
 Vue.use(VueRouter)
 
@@ -36,7 +37,8 @@ const routes = [
       { path: '/incomeExpenditure', component: IncomeExpenditure },
       { path: '/goods/add', component: AddGoods },
       { path: '/prayers', component: Prayers },
-      { path: '/meetings', component: Meetings }
+      { path: '/meetings', component: Meetings },
+      { path: '/notes', component: Note }
     ]
   }
 ]
