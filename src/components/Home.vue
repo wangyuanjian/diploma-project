@@ -8,12 +8,19 @@
       <div>
         <el-dropdown @command="handleDropdownCommand">
           <span class="el-dropdown-link">
-            <i class="iconfont icon-user"></i>
-            <i class="el-icon-arrow-down el-icon--right"></i>
+            <!-- hidden 是否隐藏 -->
+            <el-badge :value="unreadNoteCount" :hidden="hiddenBadge">
+              <i class="iconfont icon-user"></i>
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </el-badge>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="message">Notes</el-dropdown-item>
-            <el-dropdown-item divided command="logout">Log out</el-dropdown-item>
+            <el-dropdown-item command="message">
+              <el-badge :value="unreadNoteCount" :hidden="hiddenBadge">
+                Notes
+              </el-badge>
+            </el-dropdown-item>
+            <el-dropdown-item divided command="logout">Log Out</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -21,7 +28,7 @@
     <el-container>
       <el-aside width="200px">
          <el-menu
-          background-color="#3f72af"
+          background-color="#5c94bd"
           text-color="#fff"
           active-text-color="#151965"
           :unique-opened="true"
@@ -62,7 +69,9 @@ export default {
   data () {
     return {
       menuList: [],
-      activePath: ''
+      activePath: '',
+      unreadNoteCount: 9,
+      hiddenBadge: false
     }
   },
   created () {
@@ -95,6 +104,8 @@ export default {
     handleDropdownCommand (command) {
       if (command === 'message') {
         this.$router.push('/notes')
+        this.unreadNoteCount = 0
+        this.hiddenBadge = true
       } else if (command === 'logout') {
         this.logout()
       }
@@ -132,7 +143,7 @@ export default {
   border-radius: 15px;
 }
 .el-main{
-  background-color: #f9f7f7;
+  background-color: #f4f4f4;
   border-radius: 15px;
 }
 .menu-name {
@@ -144,5 +155,14 @@ export default {
 }
 .el-icon-arrow-down {
   font-size: 20px;
+}
+/deep/ .el-submenu__title i {
+  color: whitesmoke;
+}
+/deep/ .el-badge__content {
+  background-color: #e89da2;
+}
+/deep/ .el-icon-arrow-down {
+  margin-left: 0;
 }
 </style>

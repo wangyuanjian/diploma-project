@@ -5,11 +5,12 @@ import {
   Row, Col, Table, TableColumn, Switch, Tooltip, Pagination, MessageBox, Dialog,
   Tag, Option, Select, Tree, Cascader, Alert, Tabs, TabPane, Step, Steps,
   Upload, DatePicker, Popover, Transfer, Collapse, CollapseItem,
-  Carousel, CarouselItem, Dropdown, DropdownMenu, DropdownItem
+  Carousel, CarouselItem, Dropdown, DropdownMenu, DropdownItem, Badge
 } from 'element-ui'
 
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
+Vue.use(Badge)
 Vue.use(DropdownItem)
 Vue.use(DropdownMenu)
 Vue.use(Dropdown)
