@@ -10,9 +10,10 @@
           <span class="el-dropdown-link">
             <!-- hidden 是否隐藏 -->
             <el-badge :value="unreadNoteCount" :hidden="hiddenBadge">
-              <i class="iconfont icon-user"></i>
-              <i class="el-icon-arrow-down el-icon--right"></i>
+              <!-- <i class="iconfont icon-user"></i> -->
+              <span class="badge-name">{{ username }}</span>
             </el-badge>
+            <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="message">
@@ -70,6 +71,8 @@ export default {
     return {
       menuList: [],
       activePath: '',
+      username: '',
+      userId: 0,
       unreadNoteCount: 9,
       hiddenBadge: false
     }
@@ -77,6 +80,8 @@ export default {
   created () {
     this.getMenuList()
     this.activePath = window.sessionStorage.getItem('activePath')
+    this.username = window.sessionStorage.getItem('username').toString().toUpperCase()
+    this.userId = window.sessionStorage.getItem('userId')
   },
   methods: {
     logout () {
@@ -153,8 +158,9 @@ export default {
 .icon-user {
   font-size: 25px;
 }
-.el-icon-arrow-down {
+.badge-name {
   font-size: 20px;
+  font-family: 'Roboto';
 }
 /deep/ .el-submenu__title i {
   color: whitesmoke;
@@ -164,5 +170,6 @@ export default {
 }
 /deep/ .el-icon-arrow-down {
   margin-left: 0;
+  font-size: 20px;
 }
 </style>

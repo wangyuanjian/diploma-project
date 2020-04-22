@@ -1,8 +1,10 @@
 <template>
   <div class="login_container">
-    <div class="color_block_left block1"></div>
-    <div class="color_block_middle block2"></div>
-    <div class="color_block_right block3"></div>
+    <div class="color_block block1"></div>
+    <div class="color_block block2"></div>
+    <div class="color_block block3"></div>
+    <div class="color_block block4"></div>
+    <div class="color_block block5"></div>
     <div class="login_box">
       <!-- 头部区域 -->
       <div class="title_box">
@@ -67,7 +69,9 @@ export default {
           return this.$message.error(result.data.errorMessage)
         }
         // console.log(result.data)
-        window.sessionStorage.setItem('token', result.data.result)
+        window.sessionStorage.setItem('token', result.data.result.nickname)
+        window.sessionStorage.setItem('username', result.data.result.username)
+        window.sessionStorage.setItem('userId', result.data.result.userId)
         this.$message.success('login successfully')
         this.$router.push('/home')
       })
@@ -106,32 +110,27 @@ export default {
   box-sizing: border-box;
 }
 
-.color_block_left{
-  height: 100%;
-  width: 40%;
-  float: left;
-}
-.color_block_middle{
+.color_block{
   height: 100%;
   width: 20%;
   float: left;
 }
-.color_block_right{
-  height: 100%;
-  width: 40%;
-  float: left;
-}
 
 .block1{
-  background-color: #F7E4C6;
+  background-color: #F2F5A6;
 }
 .block2{
-  background-color: #F7D9A8;
+  background-color: #FCD781;
 }
 .block3{
-  background-color: #F7CC86;
+  background-color: #FFB35C;
 }
-
+.block4{
+  background-color: #FF9447;
+}
+.block5{
+  background-color: #FF7530;
+}
 .form-btns{
   display: flex;
   justify-content: flex-end;

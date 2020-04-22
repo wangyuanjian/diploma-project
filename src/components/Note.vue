@@ -5,10 +5,12 @@
         <img src="../assets/email.svg" alt="">
       </div>
       <div class="add-note-input">
-        <el-input type="textarea" :rows="2"
-        placeholder="add n new note......" v-model="addNote">
+        <div class="add-note-date">{{today}}</div>
+        <el-input type="textarea" :rows="3"
+        placeholder="add n new note and other administrators will be notified....." v-model="note">
         </el-input>
-        <el-button type="primary" plain class="add-button" size="medium">Add</el-button>
+        <el-button type="primary" plain class="add-button"
+        @click="addNote"  size="medium">Add</el-button>
       </div>
     </div>
     <div class="note-box">
@@ -16,7 +18,7 @@
         <div class="add-note-icon icon-center">
           <img src="../assets/unread.svg" alt="">
         </div>
-        <div class="status-tip">unread</div>
+        <div class="status-tip">Unread</div>
       </div>
       <div class="history-note">
         <div class="add-note-icon icon-center">
@@ -32,11 +34,38 @@
 export default {
   data () {
     return {
-      addNote: ''
+      note: ''
     }
   },
   created () {},
-  methods: {}
+  computed: {
+    today () {
+      const date = new Date()
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1).toString().padStart(2, 0)
+      const day = date.getDate().toString().padStart(2, 0)
+      console.log(`${year}-${month}-${day}`)
+      return `${year}-${month}-${day}`
+    }
+  },
+  methods: {
+    async addNote () {
+      if (!this.note || this.note.length === 0) {
+        return this.$message.error('note not empty')
+      }
+      const result = await this.$http.post('/addNote?pageSize=10', {
+        content: this.note,
+        userId: window.sessionStorage.getItem('userId')
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to add new note')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      console.log(result.data.result)
+    }
+  }
 }
 </script>
 
@@ -70,6 +99,12 @@ export default {
   display: inline-block;
   margin-left: 30px;
   width: 85%;
+}
+.add-note-date {
+  float: right;
+  font-size: 13px;
+  color: #999999;
+  margin-bottom: 2px;
 }
 .unread-note {
   display: inline-block;
