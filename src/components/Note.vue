@@ -19,12 +19,18 @@
           <img src="../assets/unread.svg" alt="">
         </div>
         <div class="status-tip">Unread</div>
+        <div>
+          <pre>{{ this.unreadNoteList }}</pre>
+        </div>
       </div>
       <div class="history-note">
         <div class="add-note-icon icon-center">
           <img src="../assets/read.svg" alt="">
         </div>
         <div class="status-tip">History</div>
+        <div>
+          <pre>{{ this.historyNoteList }}</pre>
+        </div>
       </div>
     </div>
   </div>
@@ -34,10 +40,37 @@
 export default {
   data () {
     return {
-      note: ''
+      historyNoteList: [],
+      unreadNoteList: [],
+      mePublishedNoteList: [],
+      note: '',
+      userId: 0,
+      unreadQueryInfo: {
+        info: '',
+        pageNum: 1,
+        pageSize: 5
+      },
+      unreadTotal: 0,
+      historyQueryInfo: {
+        info: '',
+        pageNum: 1,
+        pageSize: 5
+      },
+      historyTotal: 0,
+      mePublishedQueryInfo: {
+        info: '',
+        pageNum: 1,
+        pageSize: 5
+      },
+      mePublishedTotal: 0
     }
   },
-  created () {},
+  created () {
+    this.userId = window.sessionStorage.getItem('userId')
+    this.getHistoryNote()
+    this.getUnreadNote()
+    this.getNotePublishedByUser()
+  },
   computed: {
     today () {
       const date = new Date()
@@ -49,6 +82,51 @@ export default {
     }
   },
   methods: {
+    async getHistoryNote () {
+      const result = await this.$http.post('/getHistoryNoteForUser?pageNum=' +
+      this.historyQueryInfo.pageNum + '&pageSize=' + this.historyQueryInfo.pageSize, {
+        userId: this.userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load history note')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      // console.log(result)
+      this.historyNoteList = result.data.result.list
+      this.historyTotal = result.data.result.total
+    },
+    async getUnreadNote () {
+      const result = await this.$http.post('/getUnreadNoteForUser?pageNum=' +
+      this.unreadQueryInfo.pageNum + '&pageSize=' + this.unreadQueryInfo.pageSize, {
+        userId: this.userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load unread note')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      // console.log(result)
+      this.unreadNoteList = result.data.result.list
+      this.unreadTotal = result.data.result.total
+    },
+    async getNotePublishedByUser () {
+      const result = await this.$http.post('/getNotePublishedByUser?pageNum=' +
+      this.mePublishedQueryInfo.pageNum + '&pageSize=' + this.mePublishedQueryInfo.pageSize, {
+        userId: this.userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load self published note')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      // console.log(result)
+      this.mePublishedNoteList = result.data.result.list
+      this.mePublishedTotal = result.data.result.total
+    },
     async addNote () {
       if (!this.note || this.note.length === 0) {
         return this.$message.error('note not empty')

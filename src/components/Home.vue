@@ -172,4 +172,8 @@ export default {
   margin-left: 0;
   font-size: 20px;
 }
+/deep/ .el-dropdown-menu__item {
+  font-family: 'Roboto';
+  font-size: 16px;
+}
 </style>
