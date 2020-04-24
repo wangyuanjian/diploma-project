@@ -160,7 +160,6 @@ export default {
       if (response.success === true) {
         this.addForm.imgUrl = response.result
         this.imgUrl = response.result
-        console.log(this.imgUrl)
         this.$message.success('upload image successfully')
         this.$router.push('/goods')
       } else {

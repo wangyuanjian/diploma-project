@@ -513,8 +513,6 @@ export default {
         this.queryInOutListBefore(7)
       } else if (tabComponent.name === 'second') {
         this.queryInOutListBefore(30)
-      } else if (tabComponent.name === 'third') {
-        console.log()
       } else if (tabComponent.name === 'fourth') {
         this.queryInOutListBefore(-1)
       }
@@ -721,7 +719,6 @@ export default {
       this.processDataAnalysisRight(this.inOutListForAnalysis, 'right-custom')
     },
     async searchIncomExpense () {
-      console.log()
       this.searchVisible = true
       const result = await this.$http.post('/getIncomeExpenseListWithCondition', {
         info: this.queryInfo.info,

@@ -258,8 +258,6 @@ export default {
           }
           this.assignMaxMinUsers()
         }
-        console.log(this.meetingListStatistics)
-        // console.log(this.meetingUsers)
       }
     },
     compareNumber (pair1, pair2) {

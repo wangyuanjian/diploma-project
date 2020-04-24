@@ -77,7 +77,6 @@ export default {
       const year = date.getFullYear()
       const month = (date.getMonth() + 1).toString().padStart(2, 0)
       const day = date.getDate().toString().padStart(2, 0)
-      console.log(`${year}-${month}-${day}`)
       return `${year}-${month}-${day}`
     }
   },
@@ -141,7 +140,6 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      console.log(result.data.result)
     }
   }
 }

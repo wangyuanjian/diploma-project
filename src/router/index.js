@@ -1,20 +1,41 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../components/Login.vue'
-import Home from '../components/Home.vue'
-import Welcome from '../components/Welcome.vue'
-import Users from '../components/user/Users.vue'
-import Roles from '../components/authority/Roles.vue'
-import Authorities from '../components/authority/Authorities.vue'
-import Categories from '../components/finance/Categories.vue'
-import Goods from '../components/finance/Goods.vue'
-import AddGoods from '../components/finance/AddGoods.vue'
-import Orders from '../components/finance/Order.vue'
-import Data from '../components/data/Data.vue'
-import IncomeExpenditure from '../components/finance/IncomeExpenditure.vue'
-import Prayers from '../components/prayer/Prayers.vue'
-import Meetings from '../components/prayer/Meetings.vue'
-import Note from '../components/Note.vue'
+
+// import Login from '../components/Login.vue'
+// import Home from '../components/Home.vue'
+// import Welcome from '../components/Welcome.vue'
+// import Note from '../components/Note.vue'
+const Login = () => import(/* webpackChunkName: "first_load" */ '../components/Login.vue')
+const Home = () => import(/* webpackChunkName: "first_load" */ '../components/Home.vue')
+const Welcome = () => import(/* webpackChunkName: "first_load" */ '../components/Welcome.vue')
+const Note = () => import(/* webpackChunkName: "first_load" */ '../components/Note.vue')
+
+// import Users from '../components/user/Users.vue'
+const Users = () => import(/* webpackChunkName: "user" */ '../components/user/Users.vue')
+
+// import Roles from '../components/authority/Roles.vue'
+// import Authorities from '../components/authority/Authorities.vue'
+const Roles = () => import(/* webpackChunkName: "authority" */ '../components/authority/Roles.vue')
+const Authorities = () => import(/* webpackChunkName: "authority" */ '../components/authority/Authorities.vue')
+
+// import Categories from '../components/finance/Categories.vue'
+// import Goods from '../components/finance/Goods.vue'
+// import AddGoods from '../components/finance/AddGoods.vue'
+// import Orders from '../components/finance/Order.vue'
+// import IncomeExpenditure from '../components/finance/IncomeExpenditure.vue'
+const Categories = () => import(/* webpackChunkName: "finance" */ '../components/finance/Categories.vue')
+const Goods = () => import(/* webpackChunkName: "finance" */ '../components/finance/Goods.vue')
+const AddGoods = () => import(/* webpackChunkName: "finance" */ '../components/finance/AddGoods.vue')
+const Orders = () => import(/* webpackChunkName: "finance" */ '../components/finance/Order.vue')
+const IncomeExpenditure = () => import(/* webpackChunkName: "finance" */ '../components/finance/IncomeExpenditure.vue')
+
+// import Data from '../components/data/Data.vue'
+const Data = () => import(/* webpackChunkName: "data" */ '../components/data/Data.vue')
+
+// import Prayers from '../components/prayer/Prayers.vue'
+// import Meetings from '../components/prayer/Meetings.vue'
+const Prayers = () => import(/* webpackChunkName: "routine" */ '../components/prayer/Prayers.vue')
+const Meetings = () => import(/* webpackChunkName: "routine" */ '../components/prayer/Meetings.vue')
 
 Vue.use(VueRouter)
 

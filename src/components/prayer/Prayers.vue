@@ -329,8 +329,8 @@ export default {
       })
     },
     enabledPrayerSelected (selection, row) {
-      console.log(selection)
-      console.log(row)
+      // console.log(selection)
+      // console.log(row)
     },
     async exportPrayerToWord () {
       const result = await this.$http.get('/exportPrayerOfWeekWord', {
