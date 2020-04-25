@@ -407,7 +407,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.inlint-div {
+/deep/ .el-breadcrumb__item {
+  font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
+}
+.inline-div {
   display: inline-block;
 }
 .header-box {

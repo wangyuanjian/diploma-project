@@ -7,11 +7,9 @@
     </el-breadcrumb>
     <el-card>
       <!-- add authority button -->
-      <el-row type="flex" justify="end">
-        <el-col :span="3">
-          <el-button type="primary" @click="addDialogVisible = true" plain icon="el-icon-circle-plus-outline">Add Authority</el-button>
-        </el-col>
-      </el-row>
+      <div class="float-to-right">
+        <el-button type="primary" @click="addDialogVisible = true" plain icon="el-icon-circle-plus-outline">Add Authority</el-button>
+      </div>
       <!-- 外层的一级权限 -->
       <el-table
         :data="authorityList" border :stripe="true"
@@ -296,11 +294,19 @@ export default {
 <style lang="less" scoped>
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
 }
 .el-table {
   margin-top: 15px;
 }
 .el-select {
   width: 100%;
+}
+.float-to-right {
+  float: right;
+  margin-bottom: 15px;
 }
 </style>

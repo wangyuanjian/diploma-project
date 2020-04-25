@@ -6,11 +6,9 @@
       <el-breadcrumb-item>Goods Categories</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
-      <el-row type="flex" justify="end">
-        <el-col :span="3">
-          <el-button type="primary" @click="showAddDialog" plain icon="el-icon-circle-plus-outline">Add Category</el-button>
-        </el-col>
-      </el-row>
+      <div class="float-to-right">
+        <el-button type="primary" @click="showAddDialog" plain icon="el-icon-circle-plus-outline">Add Category</el-button>
+      </div>
       <tree-table :data="categoryList" :columns="columns" :selection-type="false"
         :expand-type="false" :show-index="true" index-text="#" border stripe
         :show-row-hover="false" class="tree-table">
@@ -276,9 +274,14 @@ export default {
 <style lang="less" scoped>
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
 }
 .tree-table {
   margin-top: 15px;
+  font-size: 14px;
 }
 .el-icon-success {
   color: lightgreen;
@@ -289,5 +292,9 @@ export default {
 }
 .el-cascader{
   width: 100%;
+}
+.float-to-right {
+  float: right;
+  margin-bottom: 15px;
 }
 </style>

@@ -9,23 +9,21 @@
     <el-card>
       <el-alert title="Only Level III are allowed to selected"  type="warning" show-icon :closable="false"></el-alert>
       <div class="select-box">
-        <p class="select-title">Please Select Goods Category : </p>
-        <el-cascader class="select-cascader"
-          expand-trigger="hover"
-          :options="categoryList" :props="cascaderProps"
-          v-model="selectedIds" clearable
-          placeholder="please select category Level III"
-          @change="categoryChanged">
-        </el-cascader>
-      </div>
-      <el-row type="flex" justify="end" :gutter="3">
-        <el-col :span="3">
+        <div>
+          <p class="select-title">Please Select Goods Category : </p>
+          <el-cascader class="select-cascader"
+            expand-trigger="hover"
+            :options="categoryList" :props="cascaderProps"
+            v-model="selectedIds" clearable
+            placeholder="please select category Level III"
+            @change="categoryChanged">
+          </el-cascader>
+        </div>
+        <div class="float-to-right">
           <el-button type="primary" @click="toAddHtml" plain icon="el-icon-circle-plus-outline">Add Goods</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button type="success" @click="exportGoodsExcel" plain icon="el-icon-download">Export Excel</el-button>
-        </el-col>
-      </el-row>
+        </div>
+      </div>
       <!-- @expand-change 可展开行展开/折叠时触发的函数，有两个参数
         第一个是当前行数据，第二个已展开所有行的数据的数组 -->
       <el-table
@@ -535,6 +533,14 @@ export default {
 <style lang="less" scoped>
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
+}
+.float-to-right {
+  float: right;
+  margin-bottom: 15px;
 }
 /deep/ .el-alert__title{
   font-size: 17px;
@@ -543,7 +549,9 @@ export default {
 
 .select-box {
   margin-top: 15px;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: space-between;
 }
 .select-title {
   float: left;

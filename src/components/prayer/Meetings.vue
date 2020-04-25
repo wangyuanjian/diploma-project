@@ -1237,6 +1237,10 @@ export default {
 }
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
 }
 .button-border {
   border: solid 1px #dcdfe6;

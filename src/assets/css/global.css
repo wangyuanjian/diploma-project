@@ -11,5 +11,9 @@ html, body, #app{
 .el-table{
   margin-top: 15px;
   margin-bottom: 15px;
-  font-size: 20px;
+  font-size: 14px;
+}
+
+.el-card {
+  border-radius: 6px;
 }

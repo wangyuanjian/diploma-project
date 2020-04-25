@@ -92,7 +92,6 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      // console.log(result)
       this.historyNoteList = result.data.result.list
       this.historyTotal = result.data.result.total
     },
@@ -107,7 +106,6 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      // console.log(result)
       this.unreadNoteList = result.data.result.list
       this.unreadTotal = result.data.result.total
     },
@@ -122,7 +120,6 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
-      // console.log(result)
       this.mePublishedNoteList = result.data.result.list
       this.mePublishedTotal = result.data.result.total
     },
@@ -140,6 +137,7 @@ export default {
       if (result.data.success === false) {
         return this.$message.error(result.data.errorMessage)
       }
+      this.getNotePublishedByUser()
     }
   }
 }

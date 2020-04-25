@@ -554,6 +554,10 @@ export default {
 <style lang="less" scoped>
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
 }
 .inlint-div {
   display: inline-block;

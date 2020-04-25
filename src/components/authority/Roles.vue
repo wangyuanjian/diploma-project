@@ -7,11 +7,9 @@
     </el-breadcrumb>
     <el-card>
       <!-- add authority button -->
-      <el-row type="flex" justify="end">
-        <el-col :span="3">
-          <el-button type="primary"  plain @click="addDialogVisible = true" icon="el-icon-circle-plus-outline">Add Role</el-button>
-        </el-col>
-      </el-row>
+      <div class="float-to-right">
+        <el-button type="primary"  plain @click="addDialogVisible = true" icon="el-icon-circle-plus-outline">Add Role</el-button>
+      </div>
       <el-table
         :data="roleList" border :stripe="true"
         style="width: 100%">
@@ -361,5 +359,9 @@ export default {
 .vcenter {
   display: flex;
   align-items: center;
+}
+.float-to-right {
+  float: right;
+  margin-bottom: 15px;
 }
 </style>

@@ -6,20 +6,19 @@
       <el-breadcrumb-item>Users</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card class="box-card">
-      <el-row :gutter="20">
-        <el-col :span="9">
+      <div class="header-box">
+        <div class="inline-box">
           <el-input placeholder="Input username for query"
-          v-model="queryInfo.info" clearable @clear="getUserList">
-            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
+          v-model="queryInfo.info" clearable @clear="getUserList" style="width: 50%">
           </el-input>
-        </el-col>
-        <el-col :span="4">
+          <el-button type="primary" plain icon="el-icon-search"
+          style="margin-left: 15px;" @click="getUserList">search</el-button>
+        </div>
+        <div class="inline-box">
           <el-button type="primary" @click="showAddDialog" plain icon="el-icon-circle-plus-outline">Add User</el-button>
-        </el-col>
-        <el-col :span="4" :offset="7">
           <el-button type="success" @click="exportUserExcel" plain icon="el-icon-download">Export Excel</el-button>
-        </el-col>
-      </el-row>
+        </div>
+      </div>
       <!-- user tables -->
        <el-table
         :data="userList" border :stripe="true"
@@ -568,6 +567,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.inline-div {
+  display: inline-block;
+}
+.header-box {
+  display: flex;
+  justify-content: space-between;
+}
 .demo-table-expand {
   font-size: 15px;
 }
@@ -588,6 +594,10 @@ export default {
 }
 /deep/ .el-breadcrumb__item {
   font-size: 17px;
+  font-family: 'Roboto';
+}
+.el-card {
+  border-radius: 15px;
 }
 .el-select {
   width: 100%;
