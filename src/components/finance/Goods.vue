@@ -557,6 +557,8 @@ export default {
   float: left;
   vertical-align: middle;
   margin-top: 10px;
+  font-family: 'Roboto';
+  font-size: 18px;
 }
 .select-cascader {
   float: left;
@@ -568,12 +570,13 @@ export default {
 .demo-table-expand {
   font-size: 15px;
   margin-left: 25px;
-  width: 65%;
+  width: 60%;
   height: 460px;
   // float: left;
   display: inline-block;
   vertical-align: top;
   overflow: auto;
+  // border: 3px solid red;
 }
 /deep/ .demo-table-expand label {
   width: 90px;
@@ -599,9 +602,13 @@ export default {
   height: 500px !important;
   padding: 10px 15px;
 }
+.detail-panel {
+  display: flex;
+  justify-content: space-between;
+}
 .goods-img-box {
   height: 460px;
-  width: 284px;
+  width: 40%;
   padding: 10px;
   // float: left;
   display: inline-block;
@@ -612,6 +619,7 @@ export default {
     box-shadow: 0 0 5px;
   }
   overflow: auto;
+  // border: 3px solid violet;
 }
 .class3 {
   height: 300px;

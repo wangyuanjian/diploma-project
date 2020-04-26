@@ -39,7 +39,7 @@
       width="40%" @close="addDialogClose">
 
       <el-form :model="addForm" :rules="addFormRules"
-      ref="addFormRef" label-width="160px" size="medium">
+      ref="addFormRef" label-width="140px" size="medium">
         <el-form-item label="category Name" prop="categoryName">
           <el-input v-model="addForm.categoryName"></el-input>
         </el-form-item>
@@ -64,7 +64,7 @@
     <el-dialog
       title="Edit Category"
       :visible.sync="editDialogVisible"
-      width="30%" @close="editDialogClose">
+      width="40%" @close="editDialogClose">
 
       <el-form :model="editForm" :rules="editFormRules"
       ref="editFormRef" label-width="120px" size="medium">

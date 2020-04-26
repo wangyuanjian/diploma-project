@@ -2,5 +2,5 @@ projectKey=diploma-frontend-project
 serverUrl=http://localhost:9000
 serverVersion=7.0.0.36138
 dashboardUrl=http://localhost:9000/dashboard/index/diploma-frontend-project
-ceTaskId=AXB6BvlZCmY7yzST_MJM
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AXB6BvlZCmY7yzST_MJM
+ceTaskId=AXGvPSADuh23jWHRBNZ-
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AXGvPSADuh23jWHRBNZ-

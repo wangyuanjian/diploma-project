@@ -89,7 +89,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="queryInfo.pageNum"
-        :page-sizes="[10]"
+        :page-sizes="[5, 10]"
         :page-size="queryInfo.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
@@ -267,7 +267,7 @@ export default {
       queryInfo: {
         info: '',
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
         startTime: '',
         endTime: ''
       },
@@ -496,9 +496,11 @@ export default {
     },
     handleSizeChange (newSize) {
       this.queryInfo.pageSize = newSize
+      this.getOrderList()
     },
     handleCurrentChange (newNum) {
       this.queryInfo.pageNum = newNum
+      this.getOrderList()
     },
     calculateOrderValue (selectedGoods) {
       var orderValue = 0

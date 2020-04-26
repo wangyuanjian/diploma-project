@@ -794,14 +794,14 @@ export default {
   width: 100%;
   height: 400px;
   // display: inline-block;
-  border: 2px solid orangered;
+  // border: 2px solid orangered;
   margin: 0 auto;
 }
 .right-data {
   width: 100%;
   height: 600px;
   // display: inline-block;
-  border: 2px solid palevioletred;
+  // border: 2px solid palevioletred;
   margin: 0 auto;
 }
 .search-for-analysis-bar {
