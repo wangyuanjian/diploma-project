@@ -29,7 +29,7 @@ import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
 
 // 配置请求的根路径
-axios.defaults.baseURL = 'http://47.99.47.238:8080'
+axios.defaults.baseURL = 'http://your-ip:8080'
 // 在 request 拦截器中展示进度条 NProgress.start()
 axios.interceptors.request.use(config => {
   NProgress.start()
