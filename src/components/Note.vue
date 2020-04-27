@@ -13,23 +13,47 @@
         @click="addNote"  size="medium">Add</el-button>
       </div>
     </div>
-    <div class="note-box">
-      <div class="unread-note">
-        <div class="add-note-icon icon-center">
-          <img src="../assets/unread.svg" alt="">
-        </div>
+    <div class="unread-note-box">
+      <div class="unread-icon">
+        <img src="../assets/real_unread.svg" alt="">
         <div class="status-tip">Unread</div>
-        <div>
-          <pre>{{ this.unreadNoteList }}</pre>
+      </div>
+      <div v-for="note in unreadNoteList" :key="note.noteId" class="unread-note-item">
+        <div class="note-content"> {{ note.content }}</div>
+        <div class="note-not-content">
+          <div class="note-others">{{ note.createTime }} | By {{ note.username }}</div>
+          <span class="to-mark-read">Mark Read</span>
         </div>
       </div>
+    </div>
+    <div class="note-box">
       <div class="history-note">
         <div class="add-note-icon icon-center">
           <img src="../assets/read.svg" alt="">
         </div>
-        <div class="status-tip">History</div>
+        <div class="status-tip">By Me</div>
         <div>
-          <pre>{{ this.historyNoteList }}</pre>
+          <div class="note-item" v-for="note in mePublishedNoteList" :key="note.noteId">
+            <div class="note-content"> {{ note.content }}</div>
+            <div class="note-not-content">
+              <div class="note-others">{{ note.createTime }} </div>
+              <span class="to-delete">Delete</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="byme-note">
+        <div class="add-note-icon icon-center">
+          <img src="../assets/unread.svg" alt="">
+        </div>
+        <div class="status-tip">History</div>
+        <div class="byme-list">
+          <div class="note-item" v-for="note in historyNoteList" :key="note.noteId">
+            <div class="note-content"> {{ note.content }}</div>
+            <div class="note-not-content">
+              <div class="note-others">{{ note.createTime }} | By {{ note.username }}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -166,8 +190,35 @@ export default {
     width: 100%;
   }
 }
+.unread-note-box {
+  border: 4px solid #992a8e;
+  font-family: 'Roboto';
+}
+.unread-note-item {
+  padding: 0 10px 10px 10px;
+  border-bottom: 1px solid #888888;
+}
+.unread-icon {
+  height: 100px;
+  width: 100%;
+  > img {
+    height: 100%;
+    width: 100%;
+  }
+  background: url(../assets/real_unread.svg) repeat-x;
+}
+.inline-div {
+  display: inline-block;
+  text-align: center;
+}
+.text-center {
+  padding: auto 0px;
+}
 .note-box {
   width: 100%;
+  font-family: 'Roboto';
+  display: flex;
+  justify-content: space-between;
 }
 .add-note-input {
   display: inline-block;
@@ -180,10 +231,10 @@ export default {
   color: #999999;
   margin-bottom: 2px;
 }
-.unread-note {
+.byme-note {
   display: inline-block;
   border: 3px solid salmon;
-  width: 47%;
+  width: 50%;
   height: 100%;
 }
 .history-note {
@@ -203,5 +254,31 @@ export default {
   font-weight: bold;
   margin-top: -30px;
   color: #381460;
+}
+.note-item {
+  border-bottom: 1px solid #888888;
+  padding: 0 10px 10px 10px;
+  margin-top: 30px;
+}
+.note-content {
+  margin: 10px 0px;
+  font-size: 18px;
+}
+.note-others {
+  color: #888888;
+}
+.note-not-content {
+  display: flex;
+  justify-content: space-between;
+}
+.to-delete {
+  color: #fe346e;
+  cursor: pointer;
+  font-weight: bolder;
+}
+.to-mark-read {
+  color: #4f81c7;
+  cursor: pointer;
+  font-weight: bolder;
 }
 </style>
