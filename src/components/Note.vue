@@ -14,17 +14,30 @@
       </div>
     </div>
     <div class="unread-note-box">
-      <div class="unread-icon">
-        <img src="../assets/real_unread.svg" alt="">
-        <div class="status-tip">Unread</div>
+      <div>
+        <span class="unread-note-title">New Notes</span>
       </div>
-      <div v-for="note in unreadNoteList" :key="note.noteId" class="unread-note-item">
+      <div class="unread-icon">
+        <!-- <img src="../assets/real_unread.svg" alt="">
+        <div class="status-tip">Unread</div> -->
+      </div>
+      <div v-if="unreadNoteList.length === 0" class="no-note-title">No Unread Note</div>
+      <div v-else v-for="note in unreadNoteList" :key="note.noteId" class="unread-note-item">
         <div class="note-content"> {{ note.content }}</div>
         <div class="note-not-content">
           <div class="note-others">{{ note.createTime }} | By {{ note.username }}</div>
           <span class="to-mark-read">Mark Read</span>
         </div>
       </div>
+      <el-pagination
+        @size-change="handleUnreadSizeChange"
+        @current-change="handleUnreadCurrentChange"
+        :current-page="unreadQueryInfo.pageNum"
+        :page-sizes="[5]"
+        :page-size="unreadQueryInfo.pageSize"
+        layout="total, prev, pager, next, jumper"
+        :total="unreadTotal">
+      </el-pagination>
     </div>
     <div class="note-box">
       <div class="history-note">
@@ -33,13 +46,23 @@
         </div>
         <div class="status-tip">By Me</div>
         <div>
-          <div class="note-item" v-for="note in mePublishedNoteList" :key="note.noteId">
+          <div v-if="mePublishedNoteList.length === 0" class="no-note-title">Issue A Note :)</div>
+          <div v-else class="note-item" v-for="note in mePublishedNoteList" :key="note.noteId">
             <div class="note-content"> {{ note.content }}</div>
             <div class="note-not-content">
               <div class="note-others">{{ note.createTime }} </div>
-              <span class="to-delete">Delete</span>
+              <span class="to-delete" @click="deleteNotePublishedByMe(note.noteId)">Delete</span>
             </div>
           </div>
+          <el-pagination
+            @size-change="handlePublishedMeSizeChange"
+            @current-change="handlePublishedMeCurrentChange"
+            :current-page="mePublishedQueryInfo.pageNum"
+            :page-sizes="[5]"
+            :page-size="mePublishedQueryInfo.pageSize"
+            layout="total, prev, pager, next, jumper"
+            :total="mePublishedTotal">
+          </el-pagination>
         </div>
       </div>
       <div class="byme-note">
@@ -48,12 +71,22 @@
         </div>
         <div class="status-tip">History</div>
         <div class="byme-list">
-          <div class="note-item" v-for="note in historyNoteList" :key="note.noteId">
+          <div v-if="historyNoteList.length === 0" class="no-note-title">No History Notes</div>
+          <div v-else class="note-item" v-for="note in historyNoteList" :key="note.noteId">
             <div class="note-content"> {{ note.content }}</div>
             <div class="note-not-content">
               <div class="note-others">{{ note.createTime }} | By {{ note.username }}</div>
             </div>
           </div>
+          <el-pagination
+            @size-change="handleHistorySizeChange"
+            @current-change="handleHistoryCurrentChange"
+            :current-page="historyQueryInfo.pageNum"
+            :page-sizes="[5]"
+            :page-size="historyQueryInfo.pageSize"
+            layout="total, prev, pager, next, jumper"
+            :total="historyTotal">
+          </el-pagination>
         </div>
       </div>
     </div>
@@ -162,12 +195,41 @@ export default {
         return this.$message.error(result.data.errorMessage)
       }
       this.getNotePublishedByUser()
+    },
+    async deleteNotePublishedByMe (noteId) {
+    },
+    handleUnreadSizeChange (newSize) {
+      this.unreadQueryInfo.pageSize = newSize
+      this.getUnreadNote()
+    },
+    handleUnreadCurrentChange (newNum) {
+      this.unreadQueryInfo.pageNum = newNum
+      this.getUnreadNote()
+    },
+    handlePublishedMeSizeChange (newSize) {
+      this.mePublishedQueryInfo.pageSize = newSize
+      this.getHistoryNote()
+    },
+    handlePublishedMeCurrentChange (newNum) {
+      this.mePublishedQueryInfo.pageNum = newNum
+      this.getHistoryNote()
+    },
+    handleHistorySizeChange (newSize) {
+      this.historyQueryInfo.pageSize = newSize
+      this.getNotePublishedByUser()
+    },
+    handleHistoryCurrentChange (newNum) {
+      this.historyQueryInfo.pageNum = newNum
+      this.getNotePublishedByUser()
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.el-pagination {
+  margin-top: 15px;
+}
 .add-note {
   padding: 10px 20px;
 }
@@ -191,8 +253,20 @@ export default {
   }
 }
 .unread-note-box {
-  border: 4px solid #992a8e;
+  // border: 4px solid #992a8e;
   font-family: 'Roboto';
+  margin-top: 40px;
+}
+.unread-note-title {
+  font-family: 'Roboto';
+  font-size: 25px;
+  color: #21243d;
+}
+.no-note-title {
+  font-size: 20px;
+  text-align: center;
+  margin-top: 10px;
+  color: #888888;
 }
 .unread-note-item {
   padding: 0 10px 10px 10px;
@@ -219,6 +293,7 @@ export default {
   font-family: 'Roboto';
   display: flex;
   justify-content: space-between;
+  margin-top: 40px;
 }
 .add-note-input {
   display: inline-block;
@@ -233,13 +308,13 @@ export default {
 }
 .byme-note {
   display: inline-block;
-  border: 3px solid salmon;
+  // border: 3px solid salmon;
   width: 50%;
   height: 100%;
 }
 .history-note {
   display: inline-block;
-  border: 3px solid blueviolet;
+  // border: 3px solid blueviolet;
   width: 47%;
 }
 .icon-center {
@@ -277,7 +352,7 @@ export default {
   font-weight: bolder;
 }
 .to-mark-read {
-  color: #4f81c7;
+  color: #4a69bb;
   cursor: pointer;
   font-weight: bolder;
 }
