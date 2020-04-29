@@ -26,7 +26,7 @@
         <div class="note-content"> {{ note.content }}</div>
         <div class="note-not-content">
           <div class="note-others">{{ note.createTime }} | By {{ note.username }}</div>
-          <span class="to-mark-read">Mark Read</span>
+          <span class="to-mark-read" @click="markNoteReadByUser(note.noteId)">Mark Read</span>
         </div>
       </div>
       <el-pagination
@@ -51,7 +51,7 @@
             <div class="note-content"> {{ note.content }}</div>
             <div class="note-not-content">
               <div class="note-others">{{ note.createTime }} </div>
-              <span class="to-delete" @click="deleteNotePublishedByMe(note.noteId)">Delete</span>
+              <span class="to-delete" @click="deleteNotePublishedByMe(note.noteId, note.content)">Delete</span>
             </div>
           </div>
           <el-pagination
@@ -195,8 +195,48 @@ export default {
         return this.$message.error(result.data.errorMessage)
       }
       this.getNotePublishedByUser()
+      this.getHistoryNote()
     },
-    async deleteNotePublishedByMe (noteId) {
+    async markNoteReadByUser (noteId) {
+      const result = await this.$http.post('/addNoteReadForUser', {
+        userId: this.userId,
+        noteId: noteId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to mark read for user')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.$message.success('mark note read for user successfully')
+      this.getUnreadNote()
+      this.getHistoryNote()
+    },
+    async deleteNotePublishedByMe (noteId, content) {
+      this.$confirm('[' + content + ']\'s will be deleted, Continue?', 'Tips', {
+        confirmButtonText: 'Continue',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(async what => {
+        const result = await this.$http.post('/deleteNote?pageSize=' + this.mePublishedQueryInfo.pageSize, {
+          noteId: noteId,
+          userId: this.userId
+        })
+        if (result.status !== 200) {
+          return this.$message.error('failed to delete note')
+        }
+        if (!result.data.success) {
+          return this.$message.error(result.data.errorMessage)
+        }
+        this.$message.success('note deleted')
+        this.getNotePublishedByUser()
+        this.getHistoryNote()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'delete note cancelled'
+        })
+      })
     },
     handleUnreadSizeChange (newSize) {
       this.unreadQueryInfo.pageSize = newSize

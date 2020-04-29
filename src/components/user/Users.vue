@@ -48,6 +48,8 @@
                 <span>{{ scope.row.updateTime }}</span>
               </el-form-item>
             </el-form>
+            <div id="calendar" class="this-calendar">
+            </div>
           </template>
         </el-table-column>
         <el-table-column type="index" label="index" width="80"></el-table-column>
@@ -219,6 +221,7 @@
 </template>
 
 <script>
+import echarts from 'echarts'
 export default {
   data () {
     var checkNewPassword2 = (rule, value, callback) => {
@@ -328,6 +331,7 @@ export default {
   },
   created () {
     this.getUserList()
+    this.processMeetingCalendar()
   },
   methods: {
     async getUserList () {
@@ -561,6 +565,39 @@ export default {
       this.assignDialogVisible = false
       this.$message.success('update role for user successfully')
       this.getUserList()
+    },
+    getVirtulData(year) {
+      year = year || '2017'
+      var date = +echarts.number.parseDate(year + '-01-01')
+      var end = +echarts.number.parseDate(year + '-12-31')
+      var dayTime = 3600 * 24 * 1000
+      var data = []
+      for (var time = date; time <= end; time += dayTime) {
+        data.push([
+          echarts.format.formatTime('yyyy-MM-dd', time),
+          Math.floor(Math.random() * 10000)
+        ])
+      }
+      return data
+    },
+    processMeetingCalendar () {
+      var calanderChart = echarts.init(document.getElementById('calendar'))
+      var option = {
+        visualMap: {
+          show: false,
+          min: 0,
+          max: 10000
+        },
+        calendar: {
+          range: '2017'
+        },
+        series: {
+          type: 'heatmap',
+          coordinateSystem: 'calendar',
+          data: this.getVirtulData(2017)
+        }
+      }
+      calanderChart.setOption(option)
     }
   }
 }
@@ -601,5 +638,10 @@ export default {
 }
 .el-select {
   width: 100%;
+}
+.this-calendar {
+  width: 935px;
+  height: 300px;
+  border: 3px solid salmon;
 }
 </style>
