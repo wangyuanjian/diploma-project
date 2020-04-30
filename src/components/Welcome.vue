@@ -87,7 +87,10 @@
           </div>
         </div>
         <div>
-          hhhhhh
+          <div v-for="(note, index) in unreadNoteList" :key="note.noteId" class="meeting-value">
+            <span>{{ index+1 }}. {{ note.content | sub-goods-name(20) }}</span>
+            <span style="float: right;">{{ note.username }}</span>
+          </div>
         </div>
       </el-card>
     </div>
@@ -98,6 +101,7 @@
 export default {
   data () {
     return {
+      unreadNoteList: [],
       carouselList: [{
         id: '0001',
         title: 'First Step Prayer',
@@ -228,11 +232,14 @@ export default {
       meetingUsers: [],
       maxUsers: [],
       minUsers: [],
-      meetings: []
+      meetings: [],
+      userId: 0
     }
   },
   created () {
     this.queryMeetingListBefore(30)
+    this.userId = window.sessionStorage.getItem('userId')
+    this.getUnreadNote()
   },
   methods: {
     async queryMeetingListBefore (nDays) {
@@ -270,6 +277,19 @@ export default {
       for (i = this.meetingUsers.length - 1; i >= this.meetingUsers.length - 2; i--) {
         this.maxUsers.push(this.meetingUsers[i])
       }
+    },
+    async getUnreadNote () {
+      const result = await this.$http.post('/getUnreadNoteForUser?pageNum=' +
+      1 + '&pageSize=' + 100, {
+        userId: this.userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load unread note')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.unreadNoteList = result.data.result.list
     }
   }
 }

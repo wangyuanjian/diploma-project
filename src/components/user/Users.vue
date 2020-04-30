@@ -20,7 +20,7 @@
         </div>
       </div>
       <!-- user tables -->
-       <el-table
+       <el-table @expand-change="expandUser"
         :data="userList" border :stripe="true"
         style="width: 100%">
         <el-table-column type="expand">
@@ -48,7 +48,7 @@
                 <span>{{ scope.row.updateTime }}</span>
               </el-form-item>
             </el-form>
-            <div id="calendar" class="this-calendar">
+            <div :id="'calendar'+scope.row.userId" ref="calendarRef"  class="this-calendar">
             </div>
           </template>
         </el-table-column>
@@ -93,7 +93,7 @@
       </el-pagination>
     </el-card>
 
-    <!-- Add User -->
+    <!-- Add User 785 848 412 -->
     <el-dialog
       title="Add User"
       :visible.sync="addDialogVisible"
@@ -331,7 +331,6 @@ export default {
   },
   created () {
     this.getUserList()
-    this.processMeetingCalendar()
   },
   methods: {
     async getUserList () {
@@ -578,26 +577,52 @@ export default {
           Math.floor(Math.random() * 10000)
         ])
       }
+      console.log(data)
       return data
     },
-    processMeetingCalendar () {
-      var calanderChart = echarts.init(document.getElementById('calendar'))
-      var option = {
-        visualMap: {
-          show: false,
-          min: 0,
-          max: 10000
-        },
-        calendar: {
-          range: '2017'
-        },
-        series: {
-          type: 'heatmap',
-          coordinateSystem: 'calendar',
-          data: this.getVirtulData(2017)
-        }
+    // 管理dom元素动态加载问题,
+    // row就是这一行的user的对象
+    expandUser (row) {
+      const list = this.getUserYearMeeting()
+      var data = []
+      for (var i = 0; i < list.length; i++) {
+        data.push([
+          list[i][0],
+          list[i][1]
+        ])
       }
-      calanderChart.setOption(option)
+      console.log(data)
+      this.$nextTick(() => {
+        var calanderChart = echarts.init(document.getElementById('calendar' + row.userId))
+        var option = {
+          visualMap: {
+            show: false,
+            min: 0,
+            max: 10000
+          },
+          calendar: {
+            range: '2018'
+          },
+          series: {
+            type: 'heatmap',
+            coordinateSystem: 'calendar',
+            data: data
+          }
+        }
+        calanderChart.setOption(option)
+      })
+    },
+    async getUserYearMeeting (userId) {
+      const result = await this.$http.post('/getUserYearMeeting', {
+        userId: this.userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load meetings')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      return result.data.result
     }
   }
 }

@@ -82,6 +82,7 @@ export default {
     this.activePath = window.sessionStorage.getItem('activePath')
     this.username = window.sessionStorage.getItem('username').toString().toUpperCase()
     this.userId = window.sessionStorage.getItem('userId')
+    this.getUnreadNote()
   },
   methods: {
     logout () {
@@ -114,6 +115,19 @@ export default {
       } else if (command === 'logout') {
         this.logout()
       }
+    },
+    async getUnreadNote () {
+      const result = await this.$http.post('/getUnreadNoteForUser?pageNum=' +
+      1 + '&pageSize=' + 100, {
+        userId: this.userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load unread note')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.unreadNoteCount = result.data.result.total
     }
   }
 }
