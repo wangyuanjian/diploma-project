@@ -565,43 +565,65 @@ export default {
       this.$message.success('update role for user successfully')
       this.getUserList()
     },
-    getVirtulData(year) {
-      year = year || '2017'
-      var date = +echarts.number.parseDate(year + '-01-01')
-      var end = +echarts.number.parseDate(year + '-12-31')
-      var dayTime = 3600 * 24 * 1000
-      var data = []
-      for (var time = date; time <= end; time += dayTime) {
-        data.push([
-          echarts.format.formatTime('yyyy-MM-dd', time),
-          Math.floor(Math.random() * 10000)
-        ])
-      }
-      console.log(data)
-      return data
-    },
     // 管理dom元素动态加载问题,
     // row就是这一行的user的对象
-    expandUser (row) {
-      const list = this.getUserYearMeeting()
+    expandUser (row, expandedRows) {
+      console.log(row.userId)
+      var flag = false
+      for (var i = 0; i < expandedRows.length; i++) {
+        if (expandedRows[i].userId === row.userId) {
+          flag = true
+          break
+        }
+      }
+      if (!flag) {
+        return
+      }
+      this.getUserYearMeeting(row.userId, row.username)
+    },
+    async getUserYearMeeting (userId, username) {
+      const result = await this.$http.post('/getUserYearMeeting', {
+        userId: userId
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to load meetings')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
       var data = []
+      const list = result.data.result
       for (var i = 0; i < list.length; i++) {
         data.push([
-          list[i][0],
-          list[i][1]
+          list[i].value,
+          list[i].number
         ])
       }
       console.log(data)
       this.$nextTick(() => {
-        var calanderChart = echarts.init(document.getElementById('calendar' + row.userId))
+        var calanderChart = echarts.init(document.getElementById('calendar' + userId))
         var option = {
+          title: {
+            text: username + ' meeting in this year',
+            left: 'center',
+            textStyle: {
+              fontSize: 20
+            }
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: 'meeting date : {b}: {c} <br/> Red Square indicate absence of one of the meetings that day' +
+            '<br/> Note: there are 2 or more meetings in a day maybe'
+          },
           visualMap: {
-            show: false,
+            show: true,
             min: 0,
-            max: 10000
+            max: 10000,
+            orient: 'horizontal'
           },
           calendar: {
-            range: '2018'
+            range: '2020',
+            width: 830
           },
           series: {
             type: 'heatmap',
@@ -611,18 +633,6 @@ export default {
         }
         calanderChart.setOption(option)
       })
-    },
-    async getUserYearMeeting (userId) {
-      const result = await this.$http.post('/getUserYearMeeting', {
-        userId: this.userId
-      })
-      if (result.status !== 200) {
-        return this.$message.error('failed to load meetings')
-      }
-      if (result.data.success === false) {
-        return this.$message.error(result.data.errorMessage)
-      }
-      return result.data.result
     }
   }
 }
@@ -667,6 +677,7 @@ export default {
 .this-calendar {
   width: 935px;
   height: 300px;
-  border: 3px solid salmon;
+  // border: 3px solid salmon;
+  margin-top: 15px;
 }
 </style>
