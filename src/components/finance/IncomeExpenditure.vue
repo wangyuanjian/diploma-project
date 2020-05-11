@@ -295,6 +295,7 @@ export default {
   data () {
     return {
       inOutList: [],
+      // 搜索inout的时候返回的数组
       inOutListWithCondition: [],
       inOutListAllDays: [],
       inOutList7Days: [],

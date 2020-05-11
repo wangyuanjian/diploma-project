@@ -21,59 +21,79 @@
           icon="el-icon-circle-plus-outline" class="add-btn">Add New Prayer</el-button>
         </div>
       </div>
-      <div class="enabled-prayers prayers">
-        <div>
-          <span class="display-title">Prayers Of Week </span>
-          <span>less than 100</span>
+      <transition mode="out-in" name="fade">
+        <div v-if="searchVisible" key="week">
+          <i class="el-icon-back" @click="backTo"></i>
+          <el-table border stripe :data="prayerListWithCondition" empty-text="no data">
+              <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+              <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
+              <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
+              <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
+              <el-table-column label="Operation" align="center" width="150">
+                <template slot-scope="scope">
+                  <el-tooltip effect="dark" content="edit prayer" placement="top">
+                    <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+            </el-table>
         </div>
-        <el-table border stripe :data="enabledPrayerList" empty-text="no data"
-        @select="enabledPrayerSelected">
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-          <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
-          <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
-          <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
-          <el-table-column label="Operation" align="center" width="150">
-            <template slot-scope="scope">
-              <el-tooltip effect="dark" content="edit prayer" placement="top">
-                <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="to history prayer" placement="top">
-                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-caret-bottom"></el-button>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="enabled-prayers prayers">
-        <div>
-          <span class="display-title">History Prayers</span>
+        <div v-else key="hitory">
+          <div class="enabled-prayers prayers">
+            <div>
+              <span class="display-title">Prayers Of Week </span>
+              <span>less than 100</span>
+            </div>
+            <el-table border stripe :data="enabledPrayerList" empty-text="no data"
+            @select="enabledPrayerSelected">
+              <el-table-column type="selection" width="55"></el-table-column>
+              <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+              <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
+              <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
+              <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
+              <el-table-column label="Operation" align="center" width="150">
+                <template slot-scope="scope">
+                  <el-tooltip effect="dark" content="edit prayer" placement="top">
+                    <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" content="to history prayer" placement="top">
+                    <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 0)" icon="el-icon-caret-bottom"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="enabled-prayers prayers">
+            <div>
+              <span class="display-title">History Prayers</span>
+            </div>
+            <el-table border stripe :data="notEnabledPrayerList" empty-text="no data">
+              <el-table-column type="selection" width="55"></el-table-column>
+              <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
+              <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
+              <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
+              <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
+              <el-table-column label="Update Time" prop="updateTime" width="120px" align="center"></el-table-column>
+              <el-table-column label="Operation" align="center" width="150">
+                <template slot-scope="scope">
+                  <el-tooltip effect="dark" content="to prayer of week" placement="top">
+                    <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 1)" icon="el-icon-caret-top"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="queryInfo.pageNum"
+              :page-sizes="[10]"
+              :page-size="queryInfo.pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
+          </div>
         </div>
-        <el-table border stripe :data="notEnabledPrayerList" empty-text="no data">
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
-          <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
-          <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
-          <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
-          <el-table-column label="Update Time" prop="updateTime" width="120px" align="center"></el-table-column>
-          <el-table-column label="Operation" align="center" width="150">
-            <template slot-scope="scope">
-              <el-tooltip effect="dark" content="to prayer of week" placement="top">
-                <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 1)" icon="el-icon-caret-top"></el-button>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="queryInfo.pageNum"
-          :page-sizes="[10]"
-          :page-size="queryInfo.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
-        </el-pagination>
-      </div>
+      </transition>
     </el-card>
     <!-- Add Prayer -->
     <el-dialog
@@ -145,6 +165,8 @@ export default {
   data () {
     return {
       enabledPrayerList: [],
+      // 搜索prayer返回的数组
+      prayerListWithCondition: [],
       notEnabledPrayerList: [],
       queryInfo: {
         info: '',
@@ -185,7 +207,8 @@ export default {
       // transferList 是有效和无效prayer的list
       transferList: [],
       // transferNotEnabledList 是无效的，里面保存的是prayer 的prayerId
-      transferNotEnabledList: []
+      transferNotEnabledList: [],
+      searchVisible: false
     }
   },
   created () {
@@ -401,7 +424,22 @@ export default {
       this.getPrayerList(1)
       this.getPrayerList(0)
     },
-    searchPrayers () {}
+    async searchPrayers () {
+      this.searchVisible = true
+      const result = await this.$http.post('/getPrayerListWithKeyWord', {
+        info: this.queryInfo.info
+      })
+      if (result.status !== 200) {
+        return this.$message.error('failed to search prayers')
+      }
+      if (result.data.success === false) {
+        return this.$message.error(result.data.errorMessage)
+      }
+      this.prayerListWithCondition = result.data.result
+    },
+    backTo () {
+      this.searchVisible = false
+    }
   }
 }
 </script>
@@ -429,5 +467,20 @@ export default {
 .prayers {
   margin-top: 30px;
   margin-bottom: 30px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  //all:过渡的属性名称, 0.2s:过渡的时长,
+  // ease:速率,ease表示开始慢然后快最后慢
+  transition: all 0.1s ease;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);   // 表示进入点的位置, X轴,正向100px处进入
+}
+.el-icon-back {
+  font-size: 25px;
+  margin-top: 15px;
 }
 </style>

@@ -52,17 +52,17 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column type="index" label="index" width="80"></el-table-column>
-        <el-table-column prop="username" label="username"></el-table-column>
-        <el-table-column prop="age" label="age"></el-table-column>
-        <el-table-column prop="enabled" label="enabled">
+        <el-table-column type="index" label="index" width="80" align="center"></el-table-column>
+        <el-table-column prop="username" label="username" align="center"></el-table-column>
+        <el-table-column prop="age" label="age" align="center"></el-table-column>
+        <el-table-column prop="enabled" label="enabled" align="center">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.enabled" :active-value="1" :inactive-value="0"
             @change="userEnabledChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="create time" width="200px"></el-table-column>
-        <el-table-column label="operation" width="250">
+        <el-table-column prop="createTime" label="create time" width="200px" align="center"></el-table-column>
+        <el-table-column label="operation" width="250" align="center">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="edit info" placement="top">
               <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
@@ -568,7 +568,6 @@ export default {
     // 管理dom元素动态加载问题,
     // row就是这一行的user的对象
     expandUser (row, expandedRows) {
-      console.log(row.userId)
       var flag = false
       for (var i = 0; i < expandedRows.length; i++) {
         if (expandedRows[i].userId === row.userId) {
@@ -599,7 +598,6 @@ export default {
           list[i].number
         ])
       }
-      console.log(data)
       this.$nextTick(() => {
         var calanderChart = echarts.init(document.getElementById('calendar' + userId))
         var option = {
