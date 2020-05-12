@@ -46,11 +46,10 @@
             </div>
             <el-table border stripe :data="enabledPrayerList" empty-text="no data"
             @select="enabledPrayerSelected">
-              <el-table-column type="selection" width="55"></el-table-column>
               <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
               <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
               <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
-              <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
+              <el-table-column label="Create Time" prop="createTime" width="110" align="center"></el-table-column>
               <el-table-column label="Operation" align="center" width="150">
                 <template slot-scope="scope">
                   <el-tooltip effect="dark" content="edit prayer" placement="top">
@@ -68,14 +67,13 @@
               <span class="display-title">History Prayers</span>
             </div>
             <el-table border stripe :data="notEnabledPrayerList" empty-text="no data">
-              <el-table-column type="selection" width="55"></el-table-column>
               <el-table-column label="Index" type="index" width="70" align="center"></el-table-column>
               <el-table-column label="Content" prop="prayerContent" align="center"></el-table-column>
               <el-table-column label="Date" prop="prayerDate" width="90px" align="center"></el-table-column>
-              <el-table-column label="Create Time" prop="createTime" width="120px" align="center"></el-table-column>
-              <el-table-column label="Update Time" prop="updateTime" width="120px" align="center"></el-table-column>
+              <el-table-column label="Create Time" prop="createTime" width="110" align="center"></el-table-column>
+              <el-table-column label="Update Time" prop="updateTime" width="112" align="center"></el-table-column>
               <el-table-column label="Operation" align="center" width="150">
-                <template slot-scope="scope">
+                <template slot-scope="scope" width="150">
                   <el-tooltip effect="dark" content="to prayer of week" placement="top">
                     <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row, scope.$index, 1)" icon="el-icon-caret-top"></el-button>
                   </el-tooltip>
@@ -310,6 +308,7 @@ export default {
         //   }
         // }
         this.getPrayerList(1)
+        this.searchPrayers()
       })
     },
     editDialogClose () {

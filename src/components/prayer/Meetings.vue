@@ -1035,7 +1035,17 @@ export default {
         series: [{
           name: legend,
           data: ys,
-          type: 'bar'
+          type: 'bar',
+          itemStyle: {
+            normal: {
+              // 这里是重点
+              color: function (params) {
+                // 注意，如果颜色太少的话，后面颜色不会自动循环，最好多定义几个颜色
+                var colorList = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622']
+                return colorList[params.dataIndex]
+              }
+            }
+          }
         }]
       }
       myBarChart.setOption(option)
@@ -1256,7 +1266,7 @@ export default {
 .echarts-div {
   width: 100%;
   height: 500px;
-  border: 3px dashed tomato;
+  // border: 3px dashed tomato;
   overflow: scroll;
 }
 .display-title {
