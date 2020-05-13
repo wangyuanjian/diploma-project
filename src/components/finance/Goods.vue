@@ -51,8 +51,10 @@
                     :multiple="false"
                     :on-success="(response, file, fileList) => uploadSuccess(response, file, fileList, scope.row)"
                     :limit="1" :headers="headerObj">
-                    <el-button slot="trigger" plain size="small" type="primary">Select Image</el-button>
-                    <el-button style="margin-left: 30px;" plain size="small" type="success" @click="submitUpload">Submit It</el-button>
+                    <div>
+                      <el-button slot="trigger" plain size="small" type="primary">Select Image</el-button>
+                      <el-button style="margin-left: 50px;" plain size="small" type="success" @click="submitUpload" >Submit It</el-button>
+                    </div>
                     <div slot="tip" class="el-upload__tip">only jpg/png and image size no more than 500kb</div>
                   </el-upload>
                 </div>
@@ -85,16 +87,14 @@
               </el-tab-pane>
               <el-tab-pane label="Goods Params" name="param">
                 <!-- 添加参数按钮 -->
-                <el-row type="flex" justify="end">
-                  <el-col :span="3" :offset="1">
-                    <el-button type="primary" @click="showAddFormDialog(scope.row)" plain icon="el-icon-circle-plus-outline">Add Param</el-button>
-                  </el-col>
-                </el-row>
-                <el-table :data="goodsParamList" border :stripe="true" style="width: 95%" class="param-table">
-                  <el-table-column type="index" label="index" width="80"></el-table-column>
-                  <el-table-column prop="key" label="param"></el-table-column>
-                  <el-table-column prop="value" label="param value"></el-table-column>
-                  <el-table-column label="Operation" width="140px">
+                <div class="float-to-right">
+                  <el-button type="primary" @click="showAddFormDialog(scope.row)" plain icon="el-icon-circle-plus-outline">Add Param</el-button>
+                </div>
+                <el-table :data="goodsParamList" border :stripe="true"  class="param-table">
+                  <el-table-column type="index" label="index" width="80" align="center"></el-table-column>
+                  <el-table-column prop="key" label="Param" align="center"></el-table-column>
+                  <el-table-column prop="value" label="Param Value" align="center"></el-table-column>
+                  <el-table-column label="Operation" width="140px" align="center">
                     <template slot-scope="scope2">
                       <el-tooltip effect="dark" content="edit param" placement="top">
                         <el-button type="primary" size="small" plain @click="showEditParamDialog(scope2.row)" icon="el-icon-edit"></el-button>
@@ -109,12 +109,12 @@
             </el-tabs>
           </template>
         </el-table-column>
-        <el-table-column type="index" label="index" width="80"></el-table-column>
-        <el-table-column prop="goodsName" label="Goods Name"></el-table-column>
-        <el-table-column prop="goodsPrice" label="Goods Price($)" width="120px"></el-table-column>
-        <el-table-column prop="goodsWeight" label="Goods Weight(oz)" width="130px"></el-table-column>
-        <el-table-column prop="goodsState" label="Goods State" width="120px"></el-table-column>
-        <el-table-column label="Operation" width="140px">
+        <el-table-column type="index" label="index" width="80" align="center"></el-table-column>
+        <el-table-column prop="goodsName" label="Goods Name" align="center"></el-table-column>
+        <el-table-column prop="goodsPrice" label="Goods Price($)" width="120px" align="center"></el-table-column>
+        <el-table-column prop="goodsWeight" label="Goods Weight(oz)" width="130px" align="center"></el-table-column>
+        <el-table-column prop="goodsState" label="Goods State" width="120px" align="center"></el-table-column>
+        <el-table-column label="Operation" width="140px" align="center">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="edit goods" placement="top">
               <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
@@ -642,6 +642,13 @@ export default {
 }
 
 .add-upload-alert {
+  margin-bottom: 15px;
+}
+img{
+  border-radius: 10px;
+}
+.float-to-right {
+  float: right;
   margin-bottom: 15px;
 }
 </style>

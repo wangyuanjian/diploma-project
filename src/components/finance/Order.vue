@@ -37,7 +37,7 @@
               <el-tag class="status-tag" type="warning">{{item.isAccepted === 1 ? 'Signed' : 'Not Signed'}}</el-tag>
             </div>
             <div class="detail-item">
-              <span class="header-text label-width">Order Custum(UserId) : </span>
+              <span class="header-text label-width">Order Customer(UserId) : </span>
               <span>{{item.username}}({{item.userId}})</span>
             </div>
             <div class="detail-item">
