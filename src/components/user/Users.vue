@@ -598,6 +598,7 @@ export default {
           list[i].number
         ])
       }
+      const year = new Date().getFullYear() + ''
       this.$nextTick(() => {
         var calanderChart = echarts.init(document.getElementById('calendar' + userId))
         var option = {
@@ -620,7 +621,7 @@ export default {
             orient: 'horizontal'
           },
           calendar: {
-            range: '2020',
+            range: year,
             width: 830
           },
           series: {

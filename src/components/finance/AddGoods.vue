@@ -52,7 +52,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" plain size="medium" @click="addGoods">Add</el-button>
-          <el-button type="info" plain size="medium" @click="resetFormFilds">Reset</el-button>
+          <el-button type="info" plain size="medium" @click="resetFormFields">Reset</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -151,7 +151,7 @@ export default {
         })
       }
     },
-    resetFormFilds () {
+    resetFormFields () {
       this.$refs.addFormRef.resetFields()
     },
     // 在添加商品前上传图片，如果上传成功那么返回的是

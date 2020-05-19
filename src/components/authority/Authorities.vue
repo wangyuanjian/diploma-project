@@ -27,7 +27,7 @@
               <el-table-column label="Operation">
                 <template slot-scope="scope">
                   <el-tooltip effect="dark" content="edit info" placement="top">
-                    <el-button type="warning" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-setting"></el-button>
+                    <el-button type="warning" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
                   </el-tooltip>
                   <el-tooltip effect="dark" content="delete authority" placement="top">
                     <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row)" icon="el-icon-delete"></el-button>
@@ -229,6 +229,9 @@ export default {
         if (!valid) {
           return this.$message.error('invalid authority info')
         }
+        if (this.addForm.authorityLevel === 1) {
+          this.addForm.pid = null
+        }
         const result = await this.$http.post('/addAuthority', {
           authorityName: this.addForm.authorityName,
           authorityDesc: this.addForm.authorityDesc,
@@ -277,7 +280,7 @@ export default {
         } else if (!result.data.success) {
           return this.$message.error(result.data.errorMessage)
         } else {
-          this.$message.success('user deleted')
+          this.$message.success('authority deleted')
           this.getAuthorityList()
         }
       }).catch(() => {
