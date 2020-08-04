@@ -28,6 +28,10 @@ import 'quill/dist/quill.bubble.css'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
+// 导入登陆验证
+import SlideVerify from 'vue-monoplasty-slide-verify'
+Vue.use(SlideVerify)
+
 // 配置请求的根路径
 axios.defaults.baseURL = 'http://127.0.0.1:8080'
 // 在 request 拦截器中展示进度条 NProgress.start()
