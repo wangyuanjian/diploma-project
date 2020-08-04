@@ -33,7 +33,7 @@
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="17">
-                    <el-tag type="warning">LEVEL III : )</el-tag>
+                    <!-- <el-tag type="warning">LEVEL III : )</el-tag> -->
                   </el-col>
                 </el-row>
               </el-col>
@@ -66,13 +66,13 @@
 
       <el-form :model="editForm" :rules="editFormRules"
       ref="editFormRef" label-width="15x0px" size="medium">
-        <el-form-item label="roleId">
+        <el-form-item label="role Id">
           <el-input v-model="editForm.roleId" disabled></el-input>
         </el-form-item>
-        <el-form-item label="roleName" prop="roleName">
+        <el-form-item label="role Name" prop="roleName">
           <el-input v-model="editForm.roleName"></el-input>
         </el-form-item>
-        <el-form-item label="roleDesc">
+        <el-form-item label="role Describe">
           <el-input v-model="editForm.roleDesc"></el-input>
         </el-form-item>
       </el-form>
@@ -307,6 +307,9 @@ export default {
     getLeafKeys (node, arr) {
       node.forEach(auth => {
         if (auth.authorityLevel === 2) {
+          return arr.push(auth.authorityId)
+        }
+        if (auth.authorityLevel === 1 && (auth.children === null || auth.children.length === 0)) {
           return arr.push(auth.authorityId)
         }
         this.getLeafKeys(auth.children, arr)

@@ -13,7 +13,7 @@
           <!-- to be finished -->
           <el-upload
             ref="uploadBeforeAdd"
-            action="http://127.0.0.1:8080/uploadGoodsImageBeforeAddingGoods"
+            action="http://47.99.47.238:8080/uploadGoodsImageBeforeAddingGoods"
             :auto-upload="false"
             :multiple="false"
             :on-success="uploadImageBeforeAdd"
@@ -148,6 +148,7 @@ export default {
           this.selectedIds = this.addForm.addSelectedIds
           this.addDialogVisible = false
           this.$message.success('add goods successfully')
+          this.$router.push('/goods')
         })
       }
     },
@@ -158,10 +159,9 @@ export default {
     // 图片在服务器上的地址
     uploadImageBeforeAdd (response, file, fileList) {
       if (response.success === true) {
-        this.addForm.imgUrl = response.result
-        this.imgUrl = response.result
+        this.addForm.imgUrl = 'http://47.99.47.238/' + response.result
+        this.imgUrl = 'http://47.99.47.238/' + response.result
         this.$message.success('upload image successfully')
-        this.$router.push('/goods')
       } else {
         this.$message.error('failed to upload image')
       }

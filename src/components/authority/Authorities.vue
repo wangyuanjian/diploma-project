@@ -27,7 +27,7 @@
               <el-table-column label="Operation">
                 <template slot-scope="scope">
                   <el-tooltip effect="dark" content="edit info" placement="top">
-                    <el-button type="warning" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
+                    <el-button type="primary" size="small" plain @click="showEditDialog(scope.row)" icon="el-icon-edit"></el-button>
                   </el-tooltip>
                   <el-tooltip effect="dark" content="delete authority" placement="top">
                     <el-button type="danger" size="small" plain @click="showDeleteDialog(scope.row)" icon="el-icon-delete"></el-button>

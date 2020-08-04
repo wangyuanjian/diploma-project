@@ -142,7 +142,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="queryInfo.pageNum"
-              :page-sizes="[10]"
+              :page-sizes="[3, 5, 10]"
               :page-size="queryInfo.pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="total">
@@ -529,7 +529,7 @@ export default {
       queryInfo: {
         info: '',
         pageNum: 1,
-        pageSize: 10
+        pageSize: 3
       },
       total: 0,
       addDialogVisible: false,

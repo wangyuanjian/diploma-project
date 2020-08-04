@@ -46,16 +46,14 @@
                   <el-upload
                     class="upload-demo"
                     ref="upload"
-                    :action="'http://127.0.0.1:8080/updateGoodsImage?goodsId=' + scope.row.goodsId"
+                    :action="'http://47.99.47.238:8080/updateGoodsImage?goodsId=' + scope.row.goodsId"
                     :auto-upload="false"
                     :multiple="false"
                     :on-success="(response, file, fileList) => uploadSuccess(response, file, fileList, scope.row)"
                     :limit="1" :headers="headerObj">
-                    <div>
-                      <el-button slot="trigger" plain size="small" type="primary">Select Image</el-button>
-                      <el-button style="margin-left: 50px;" plain size="small" type="success" @click="submitUpload" >Submit It</el-button>
-                    </div>
-                    <div slot="tip" class="el-upload__tip">only jpg/png and image size no more than 500kb</div>
+                    <el-button slot="trigger" plain size="small" type="primary">Select Image</el-button>
+                    <el-button style="margin-left: 50px;" plain size="small" type="success" @click="submitUpload" >Submit It</el-button>
+                    <div slot="tip" class="el-upload__tip">choose an image to upload</div>
                   </el-upload>
                 </div>
                 <el-form label-position="left" label-width="160px" class="demo-table-expand">
@@ -407,6 +405,7 @@ export default {
           return this.$message.error(result.data.errorMessage)
         }
         this.$message.success('delete goods sucessfully')
+        this.getGoodsList()
         this.selectedIds = []
       }).catch(() => {
         this.$message({
@@ -522,6 +521,7 @@ export default {
     },
     uploadSuccess (response, file, fileList, goodsData) {
       goodsData = response.result
+      this.getGoodsList()
     },
     submitUploadBeforeAdd () {
       this.$refs.uploadBeforeAdd.submit()
