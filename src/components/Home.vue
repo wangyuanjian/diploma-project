@@ -9,7 +9,11 @@
         <el-dropdown @command="handleDropdownCommand">
           <span class="el-dropdown-link">
             <!-- hidden 是否隐藏 -->
-            <el-badge :value="unreadNoteCount" :hidden="hiddenBadge">
+            <el-badge v-if="unreadNoteCount > 0" :value="unreadNoteCount" :hidden="hiddenBadge">
+              <!-- <i class="iconfont icon-user"></i> -->
+              <span class="badge-name">{{ username }}</span>
+            </el-badge>
+            <el-badge v-else :hidden="hiddenBadge">
               <!-- <i class="iconfont icon-user"></i> -->
               <span class="badge-name">{{ username }}</span>
             </el-badge>
@@ -17,7 +21,10 @@
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="message">
-              <el-badge :value="unreadNoteCount" :hidden="hiddenBadge">
+              <el-badge v-if="unreadNoteCount > 0" :value="unreadNoteCount" :hidden="hiddenBadge">
+                Notes
+              </el-badge>
+              <el-badge v-else :hidden="hiddenBadge">
                 Notes
               </el-badge>
             </el-dropdown-item>
@@ -73,7 +80,7 @@ export default {
       activePath: '',
       username: '',
       userId: 0,
-      unreadNoteCount: 9,
+      unreadNoteCount: 0,
       hiddenBadge: false
     }
   },

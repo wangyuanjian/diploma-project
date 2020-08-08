@@ -243,7 +243,7 @@ export default {
   },
   methods: {
     async queryMeetingListBefore (nDays) {
-      if (!this.meetingListStatistics || this.meetingListStatistics.length === 0) {
+      if (!this.meetingListStatistics) {
         const result = await this.$http.get('/getMeetingDateBefore?nDays=' + nDays)
         if (result.status !== 200) {
           return this.$message.error('failed to load recent Days')
